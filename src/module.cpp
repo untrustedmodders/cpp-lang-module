@@ -21,10 +21,6 @@ namespace cpplm {
 		void Shutdown() override {
 		}
 
-		void* GetMethod(const std::string& name) override {
-			return nullptr;
-		}
-
 		void OnNativeAdded(/* data */) override {
 			// TODO: Add to natives map
 		}
@@ -34,6 +30,10 @@ namespace cpplm {
 		}
 
 		void OnStartPlugin(const IPlugin& plugin) override {
+			// TODO: implement
+		}
+
+		void OnEndPlugin(const IPlugin& plugin) override {
 			// TODO: implement
 		}
 
