@@ -16,5 +16,5 @@ add_library(${PROJECT_NAME} SHARED ${CPPLM_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE "external/wizard/include")
 
 include(GenerateExportHeader)
-generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/module_export.h)
+generate_export_header(${PROJECT_NAME} EXPORT_MACRO_NAME CPPLM_EXPORT EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/module_export.h)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/exports)

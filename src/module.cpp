@@ -44,12 +44,12 @@ namespace cpplm {
 
 	CppLanguageModule g_cpplm;
 
-    CPP_LANG_MODULE_EXPORT void* GetNativeMethod(std::string_view method_name) {
+    CPPLM_EXPORT void* GetNativeMethod(std::string_view method_name) {
 		return g_cpplm.GetNativeMethod(method_name);
 	}
 }
 
 extern "C"
-CPP_LANG_MODULE_EXPORT ILanguageModule* GetLanguageModule() {
+CPPLM_EXPORT ILanguageModule* GetLanguageModule() {
 	return &cpplm::g_cpplm;
 }
