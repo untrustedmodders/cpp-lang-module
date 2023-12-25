@@ -49,6 +49,6 @@ namespace cpplm {
 	}
 }
 
-extern "C" CPP_LANG_MODULE_EXPORT wizard::ILanguageModule* GetLanguageModule() {
+extern "C" CPP_LANG_MODULE_EXPORT ILanguageModule* GetLanguageModule() {
 	return &cpplm::g_cpplm;
 }
