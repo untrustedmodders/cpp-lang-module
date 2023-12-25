@@ -1,6 +1,6 @@
 #include <wizard/plugin.h>
 #include <wizard/language_module.h>
-#include "module_export.h"
+#include <module_export.h>
 
 using namespace wizard;
 
@@ -49,6 +49,7 @@ namespace cpplm {
 	}
 }
 
-extern "C" CPP_LANG_MODULE_EXPORT ILanguageModule* GetLanguageModule() {
+extern "C"
+CPP_LANG_MODULE_EXPORT ILanguageModule* GetLanguageModule() {
 	return &cpplm::g_cpplm;
 }
