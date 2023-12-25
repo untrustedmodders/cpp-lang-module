@@ -1,5 +1,6 @@
 #include <wizard/plugin.h>
 #include <wizard/language_module.h>
+#include "module_export.h"
 
 using namespace wizard;
 
@@ -43,11 +44,11 @@ namespace cpplm {
 
 	CppLanguageModule g_cpplm;
 
-	__declspec(dllexport) void* GetNativeMethod(std::string_view method_name) {
+    CPP_LANG_MODULE_EXPORT void* GetNativeMethod(std::string_view method_name) {
 		return g_cpplm.GetNativeMethod(method_name);
 	}
 }
 
-__declspec(dllexport) wizard::ILanguageModule* GetLanguageModule() {
+extern "C" CPP_LANG_MODULE_EXPORT wizard::ILanguageModule* GetLanguageModule() {
 	return &cpplm::g_cpplm;
 }

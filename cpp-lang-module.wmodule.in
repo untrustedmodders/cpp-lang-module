@@ -1,0 +1,15 @@
+{
+    "fileVersion": 1,
+    "version": 1,
+    "versionName": "1.0",
+    "friendlyName": "Cpp language module",
+    "language": "cpp",
+    "description": "Adds support for C++ plugins",
+    "createdBy": "untrustedmodders",
+    "createdByURL": "https://github.com/untrustedmodders/",
+    "docsURL": "https://github.com/untrustedmodders/cpp-lang-module/README.md",
+    "downloadURL": "https://github.com/orgs/untrustedmodders/cpp-lang-module.zip",
+    "supportURL": "https://github.com/untrustedmodders/cpp-lang-module/issues",
+    "supportedPlatforms": [],
+    "forceLoad": false
+}
