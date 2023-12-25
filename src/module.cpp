@@ -26,15 +26,15 @@ namespace cpplm {
 			// TODO: Add to natives map
 		}
 
-		LoadResult OnLoadPlugin(const IPlugin& plugin) override {
+		LoadResult OnPluginLoad(const IPlugin& plugin) override {
 			return {};
 		}
 
-		void OnStartPlugin(const IPlugin& plugin) override {
+		void OnPluginStart(const IPlugin& plugin) override {
 			// TODO: implement
 		}
 
-		void OnEndPlugin(const IPlugin& plugin) override {
+		void OnPluginEnd(const IPlugin& plugin) override {
 			// TODO: implement
 		}
 
