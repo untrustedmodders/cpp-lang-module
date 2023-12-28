@@ -1,4 +1,5 @@
 #include <wizard/plugin.h>
+#include <wizard/wizard_provider.h>
 #include <wizard/language_module.h>
 #include <module_export.h>
 
@@ -15,11 +16,18 @@ namespace cpplm {
 		}
 
 		// ILanguageModule
-		bool Initialize() override {
-			return true;
+		InitResult Initialize(std::weak_ptr<IWizardProvider> provider, const IModule& module) override {
+			if (!(_provider = provider.lock())) {
+				return ErrorData{"Provider not exposed"};
+			}
+
+			_provider->Log("CPPLM Inited!", ErrorLevel::INFO);
+
+			return LoadResultData{};
 		}
 
 		void Shutdown() override {
+			_provider.reset();
 		}
 
 		void OnNativeAdded(/* data */) override {
@@ -40,11 +48,13 @@ namespace cpplm {
 
 	private:
 		//TODO: _nativesMap
+		std::shared_ptr<IWizardProvider> _provider;
 	};
 
 	CppLanguageModule g_cpplm;
 
-    CPPLM_EXPORT void* GetNativeMethod(std::string_view method_name) {
+	extern "C"
+	CPPLM_EXPORT void* GetNativeMethod(std::string_view method_name) {
 		return g_cpplm.GetNativeMethod(method_name);
 	}
 }
