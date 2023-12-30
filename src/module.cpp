@@ -1,34 +1,37 @@
 #include "assembly.h"
+#include <wizard/plugin_descriptor.h>
 #include <wizard/plugin.h>
 #include <wizard/wizard_provider.h>
 #include <wizard/language_module.h>
+#include <wizard/cpp_plugin.h>
 #include <module_export.h>
-#include <map>
+#include <unordered_map>
+#include <format>
+#include <array>
 
 using namespace wizard;
+namespace fs = std::filesystem;
 
 namespace cpplm {
+	
+
 	class CppLanguageModule final : public ILanguageModule {
 	public:
 		CppLanguageModule() = default;
 
-		void* GetNativeMethod(std::string_view method_name) {
-			// TODO: find in _nativesMap
-			return nullptr;
-		}
-
 		// ILanguageModule
 		InitResult Initialize(std::weak_ptr<IWizardProvider> provider, const IModule& module) override {
 			if (!(_provider = provider.lock())) {
-				return ErrorData{"Provider not exposed"};
+				return ErrorData{ "Provider not exposed" };
 			}
 
 			_provider->Log("CPPLM Inited!", ErrorLevel::INFO);
 
-			return LoadResultData{};
+			return InitResultData{};
 		}
 
 		void Shutdown() override {
+			_assemblyMap.clear();
 			_provider.reset();
 		}
 
@@ -37,44 +40,113 @@ namespace cpplm {
 		}
 
 		LoadResult OnPluginLoad(const IPlugin& plugin) override {
-			// TODO: implement
-			return ErrorData{"Not implement!"};
+			fs::path assemblyPath = "."; // TODO
+
+			auto assembly = Assembly::LoadFromPath(assemblyPath);
+			if (!assembly) {
+				return ErrorData{ std::format("Failed to load assembly: {}", Assembly::GetError()) };
+			}
+
+			bool funcFail = false;
+			std::vector<std::string_view> funcErrors;
+
+			auto initFunc = assembly->GetFunction<InitFunc>("Wizard_Init");
+			if (!initFunc) {
+				funcFail = true;
+				funcErrors.emplace_back("Wizard_Init");
+			}
+
+			auto startFunc = assembly->GetFunction<StartFunc>("Wizard_StartPlugin");
+			if (!startFunc) {
+				funcFail = true;
+				funcErrors.emplace_back("Wizard_StartPlugin");
+			}
+
+			auto endFunc = assembly->GetFunction<EndFunc>("Wizard_EndPlugin");
+			if (!endFunc) {
+				funcFail = true;
+				funcErrors.emplace_back("Wizard_EndPlugin");
+			}
+
+			if (funcFail) {
+				std::ostringstream funcs;
+				funcs << funcErrors[0];
+				for (auto it = std::next(funcErrors.begin()); it != funcErrors.end(); ++it) {
+					funcs << ", " << funcErrors[0];
+				}
+				return ErrorData{ std::format("Not found {} function", funcs.str()) };
+			}
+
+			int resultVersion = initFunc(const_cast<void**>(_pluginApi.data()), kApiVersion);
+			if (resultVersion != 0) {
+				return ErrorData{ std::format("Not supported plugin api {}, max supported {}", resultVersion, kApiVersion) };
+			}
+
+			funcErrors.clear();
+			std::vector<std::pair<std::string, void*>> methods;
+			// TODO: GetExports
+
+			auto [_, result] = _assemblyMap.try_emplace(plugin.GetName(), std::move(assembly), startFunc, endFunc);
+			if (!result) {
+				return ErrorData{ std::format("Plugin name duplicate") };
+			}
+
+			return LoadResultData{ std::move(methods) };
 		}
 
 		void OnPluginStart(const IPlugin& plugin) override {
-			const std::string& pluginName = plugin.GetName();
-			if (const auto it = _assemblyMap.find(pluginName); it != _assemblyMap.end()) {
-				const auto& assembly = *std::get<std::unique_ptr<Assembly>>(*it).get();
-				using StartFuncTy = void (*)();
-				if (auto* const startFunc = assembly.GetFunction<StartFuncTy>(pluginName + "_OnPluginStart")) {
-					startFunc();
-				}
+			if (const auto it = _assemblyMap.find(plugin.GetName()); it != _assemblyMap.end()) {
+				const auto& assemblyHolder = std::get<AssemblyHolder>(*it);
+				assemblyHolder.GetStartFunc()();
 			}
 		}
 
 		void OnPluginEnd(const IPlugin& plugin) override {
-			const std::string& pluginName = plugin.GetName();
-			if (const auto it = _assemblyMap.find(pluginName); it != _assemblyMap.end()) {
-				const auto& assembly = *std::get<std::unique_ptr<Assembly>>(*it).get();
-				using EndFuncTy = void (*)();
-				if (auto* const startFunc = assembly.GetFunction<EndFuncTy>(pluginName + "_OnPluginEnd")) {
-					startFunc();
-				}
+			if (const auto it = _assemblyMap.find(plugin.GetName()); it != _assemblyMap.end()) {
+				const auto& assemblyHolder = std::get<AssemblyHolder>(*it);
+				assemblyHolder.GetEndFunc()();
 			}
 		}
 
+		// Plugin API methods
+		void* GetNativeMethod(const std::string& method_name) {
+			if (const auto it = _nativesMap.find(method_name); it != _nativesMap.end()) {
+				return std::get<void*>(*it);
+			}
+			return nullptr;
+		}
+
 	private:
-		//TODO: _nativesMap
+		class AssemblyHolder {
+		public:
+			AssemblyHolder(std::unique_ptr<Assembly> assembly, StartFunc startFunc, EndFunc endFunc) : _assembly{ std::move(assembly) }, _startFunc{ startFunc }, _endFunc{ endFunc } {
+			}
+
+			StartFunc GetStartFunc() const { return _startFunc; }
+			EndFunc GetEndFunc() const { return _endFunc; }
+
+		private:
+			std::unique_ptr<Assembly> _assembly;
+			StartFunc _startFunc{ nullptr };
+			EndFunc _endFunc{ nullptr };
+		};
+
 		std::shared_ptr<IWizardProvider> _provider;
-		std::map<std::string, std::unique_ptr<Assembly>> _assemblyMap;
+		std::unordered_map<std::string, AssemblyHolder> _assemblyMap;
+		std::unordered_map<std::string, void*> _nativesMap;
+
+		static const std::array<void*, 1> _pluginApi;
 	};
 
 	CppLanguageModule g_cpplm;
 
-	extern "C"
-	CPPLM_EXPORT void* GetNativeMethod(std::string_view method_name) {
+	void* GetNativeMethodImpl(const std::string& method_name) {
 		return g_cpplm.GetNativeMethod(method_name);
 	}
+
+	const std::array<void*, 1> CppLanguageModule::_pluginApi = {
+		reinterpret_cast<void*>(&GetNativeMethodImpl)
+	};
 }
 
 extern "C"
