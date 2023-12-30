@@ -29,3 +29,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC wizard)
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME} EXPORT_MACRO_NAME CPPLM_EXPORT EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/module_export.h)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/exports)
+
+
+add_subdirectory(test/example_plugin)
