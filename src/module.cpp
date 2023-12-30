@@ -25,7 +25,7 @@ namespace cpplm {
 				return ErrorData{ "Provider not exposed" };
 			}
 
-			_provider->Log("CPPLM Inited!", ErrorLevel::INFO);
+			_provider->Log("CPPLM Inited!", Severity::Debug);
 
 			return InitResultData{};
 		}
