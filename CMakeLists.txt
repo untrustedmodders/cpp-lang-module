@@ -4,6 +4,7 @@ if(POLICY CMP0092)
     cmake_policy(SET CMP0092 NEW) # Don't add -W3 warning level by default.
 endif()
 
+
 project(cpp-lang-module VERSION 1.0.0.0  DESCRIPTION "C++ Language Module" HOMEPAGE_URL "https://github.com/untrustedmodders/cpp-lang-module" LANGUAGES "CXX")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -24,7 +25,7 @@ file(GLOB_RECURSE CPPLM_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp"
 
 add_library(${PROJECT_NAME} SHARED ${CPPLM_SOURCES})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC wizard)
+target_link_libraries(${PROJECT_NAME} PRIVATE wizard)
 
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME} EXPORT_MACRO_NAME CPPLM_EXPORT EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/module_export.h)
