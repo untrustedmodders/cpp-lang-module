@@ -1,4 +1,4 @@
-#include <wizard_export.h>
+#include <plugin_export.h>
 #include <string_view>
 #include <iostream>
 
@@ -20,7 +20,7 @@ namespace wizard {
 	GetMethodFn GetMethod;
 
 	extern "C"
-	WIZARD_EXPORT int Wizard_Init(void** api, int version) {
+	PLUGIN_API int Wizard_Init(void** api, int version) {
 		if (version < kApiVersion) {
 			return kApiVersion;
 		}
@@ -31,12 +31,12 @@ namespace wizard {
 	}
 
 	extern "C"
-	WIZARD_EXPORT void Wizard_PluginStart() {
+	PLUGIN_API void Wizard_PluginStart() {
 		GetPluginEntry()->OnPluginStart();
 	}
 
 	extern "C"
-	WIZARD_EXPORT void Wizard_PluginEnd() {
+	PLUGIN_API void Wizard_PluginEnd() {
 		GetPluginEntry()->OnPluginEnd();
 	}
 }
