@@ -10,13 +10,13 @@
       "hidden": true
     },
     {
-      "name": "debug",
+      "name": "Debug",
       "displayName": "Debug",
       "inherits": "default",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
     },
     {
-      "name": "release",
+      "name": "Release",
       "displayName": "Release",
       "inherits": "default",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
