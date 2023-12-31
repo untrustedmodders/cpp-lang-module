@@ -35,7 +35,10 @@ namespace cpplm {
 		}
 
 		void OnMethodExport(const IPlugin& plugin) override {
-			// TODO: Add to natives map
+			const auto& pluginName = plugin.GetName();
+			for (const auto& methodData : plugin.GetMethods()) {
+				_nativesMap.try_emplace(std::format("{}.{}", pluginName, methodData.first), methodData.second);
+			}
 		}
 
 		LoadResult OnPluginLoad(const IPlugin& plugin) override {
