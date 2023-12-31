@@ -23,7 +23,7 @@ namespace cpplm {
 				return ErrorData{ "Provider not exposed" };
 			}
 
-			_provider->Log("CPPLM Inited!", Severity::Debug);
+			_provider->Log("[CPPLM] Inited!", Severity::Debug);
 
 			return InitResultData{};
 		}
@@ -135,6 +135,7 @@ namespace cpplm {
 			if (const auto it = _nativesMap.find(method_name); it != _nativesMap.end()) {
 				return std::get<void*>(*it);
 			}
+			_provider->Log(std::format("[CPPLM] GetNativeMethod failed to find {}", method_name), Severity::Fatal);
 			return nullptr;
 		}
 
