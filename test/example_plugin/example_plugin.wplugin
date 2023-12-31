@@ -15,5 +15,12 @@
 		"name": "cpp"
 	},
 	"dependencies": [],
-	"exportedMethods": []
+	"exportedMethods": [
+		{
+			"name": "MakePrint",
+			"funcName": "MakePrint",
+			"paramTypes": [ "int32" ],
+			"retType": "void"
+		}
+	]
 }

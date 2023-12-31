@@ -1,0 +1,23 @@
+{
+	"fileVersion": 1,
+	"version": 1,
+	"versionName": "1.0",
+	"friendlyName": "Mega",
+	"description": "Mega plugin",
+	"createdBy": "untrustedmodders",
+	"createdByURL": "https://github.com/untrustedmodders/",
+	"docsURL": "https://github.com/orgs/untrustedmodders/README.md",
+	"downloadURL": "https://github.com/orgs/untrustedmodders/mega.zip",
+	"supportURL": "https://github.com/untrustedmodders/wizard/issues",
+	"assemblyPath": "bin/mega",
+	"supportedPlatforms": [],
+	"languageModule": {
+		"name": "cpp"
+	},
+	"dependencies": [
+		{
+			"name": "example_plugin"
+		}
+	],
+	"exportedMethods": []
+}

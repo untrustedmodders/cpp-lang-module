@@ -38,6 +38,3 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         CPPLM_PLATFORM_LINUX=$<BOOL:${UNIX}>
         BINARY_MODULE_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}"
         BINARY_MODULE_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
-
-
-add_subdirectory(test/example_plugin)
