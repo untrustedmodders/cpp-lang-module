@@ -1,64 +1,17 @@
+#include <wizard/cpp_plugin.h>
 #include <plugin_export.h>
-#include <string_view>
 #include <iostream>
-
-namespace wizard {
-	constexpr int kApiVersion = 1;
-
-	class IPluginEntry {
-	protected:
-		~IPluginEntry() = default;
-
-	public:
-		virtual void OnPluginStart() {};
-		virtual void OnPluginEnd() {};
-	};
-
-	IPluginEntry* GetPluginEntry();
-
-	using GetMethodFn = void* (*)(std::string_view);
-	GetMethodFn GetMethod;
-
-	extern "C"
-	PLUGIN_API int Wizard_Init(void** api, int version) {
-		if (version < kApiVersion) {
-			return kApiVersion;
-		}
-
-		GetMethod = reinterpret_cast<GetMethodFn>(api[0]);
-
-		return 0;
-	}
-
-	extern "C"
-	PLUGIN_API void Wizard_PluginStart() {
-		GetPluginEntry()->OnPluginStart();
-	}
-
-	extern "C"
-	PLUGIN_API void Wizard_PluginEnd() {
-		GetPluginEntry()->OnPluginEnd();
-	}
-}
 
 class ExamplePlugin : public wizard::IPluginEntry {
 public:
-	void OnPluginStart() override;
-	void OnPluginEnd() override;
+	void OnPluginStart() override {
+		std::cout << "Example Start!" << std::endl;
+	}
+
+	void OnPluginEnd() override {
+		std::cout << "Example End!" << std::endl;
+	}
 };
 
 ExamplePlugin g_examplePlugin;
-
-namespace wizard {
-	wizard::IPluginEntry* GetPluginEntry() {
-		return &g_examplePlugin;
-	}
-}
-
-void ExamplePlugin::OnPluginStart() {
-	std::cout << "Example Start!" << std::endl;
-}
-
-void ExamplePlugin::OnPluginEnd() {
-	std::cout << "Example End!" << std::endl;
-}
+EXPOSE_PLUGIN(PLUGIN_API, &g_examplePlugin)

@@ -13,8 +13,6 @@ using namespace wizard;
 namespace fs = std::filesystem;
 
 namespace cpplm {
-	
-
 	class CppLanguageModule final : public ILanguageModule {
 	public:
 		CppLanguageModule() = default;
@@ -31,6 +29,7 @@ namespace cpplm {
 		}
 
 		void Shutdown() override {
+			_nativesMap.clear();
 			_assemblyMap.clear();
 			_provider.reset();
 		}
@@ -165,7 +164,7 @@ namespace cpplm {
 	}
 
 	const std::array<void*, 1> CppLanguageModule::_pluginApi = {
-		reinterpret_cast<void*>(&GetNativeMethodImpl)
+		reinterpret_cast<void*>(&GetNativeMethodImpl),
 	};
 }
 
