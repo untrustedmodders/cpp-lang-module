@@ -76,19 +76,37 @@ namespace cpplm {
 				for (auto it = std::next(funcErrors.begin()); it != funcErrors.end(); ++it) {
 					funcs << ", " << *it;
 				}
-				return ErrorData{ std::format("Not found {} function", funcs.str()) };
+				return ErrorData{ std::format("Not found {} function(s)", funcs.str()) };
 			}
 
-			int resultVersion = initFunc(const_cast<void**>(_pluginApi.data()), kApiVersion);
+			funcFail = false;
+			funcErrors.clear();
+			std::vector<std::pair<std::string, void*>> methods;
+			const auto& exportedMethods = plugin.GetDescriptor().exportedMethods;
+			for (const auto& method : exportedMethods) {
+				if (auto* const func = assembly->GetFunction(method.name.c_str())) {
+					methods.emplace_back(std::format("{}/{}", plugin.GetName(), method.name), func);
+				}
+				else {
+					funcFail = true;
+					funcErrors.emplace_back(method.name);
+				}
+			}
+			if (funcFail) {
+				std::ostringstream funcs;
+				funcs << funcErrors[0];
+				for (auto it = std::next(funcErrors.begin()); it != funcErrors.end(); ++it) {
+					funcs << ", " << *it;
+				}
+				return ErrorData{ std::format("Not found {} method function(s)", funcs.str()) };
+			}
+
+			const int resultVersion = initFunc(const_cast<void**>(_pluginApi.data()), kApiVersion);
 			if (resultVersion != 0) {
 				return ErrorData{ std::format("Not supported plugin api {}, max supported {}", resultVersion, kApiVersion) };
 			}
 
-			funcErrors.clear();
-			std::vector<std::pair<std::string, void*>> methods;
-			// TODO: GetExports
-
-			auto [_, result] = _assemblyMap.try_emplace(plugin.GetName(), std::move(assembly), startFunc, endFunc);
+			const auto [_, result] = _assemblyMap.try_emplace(plugin.GetName(), std::move(assembly), startFunc, endFunc);
 			if (!result) {
 				return ErrorData{ std::format("Plugin name duplicate") };
 			}
@@ -111,7 +129,7 @@ namespace cpplm {
 		}
 
 		// Plugin API methods
-		void* GetNativeMethod(const std::string& method_name) {
+		void* GetNativeMethod(const std::string& method_name) const {
 			if (const auto it = _nativesMap.find(method_name); it != _nativesMap.end()) {
 				return std::get<void*>(*it);
 			}
