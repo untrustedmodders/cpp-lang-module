@@ -34,7 +34,7 @@ namespace cpplm {
 			_provider.reset();
 		}
 
-		void OnNativeAdded(/* data */) override {
+		void OnMethodExport(const IPlugin& plugin) override {
 			// TODO: Add to natives map
 		}
 
@@ -80,11 +80,11 @@ namespace cpplm {
 
 			funcFail = false;
 			funcErrors.clear();
-			std::vector<std::pair<std::string, void*>> methods;
+			std::vector<MethodData> methods;
 			const auto& exportedMethods = plugin.GetDescriptor().exportedMethods;
 			for (const auto& method : exportedMethods) {
-				if (auto* const func = assembly->GetFunction(method.name.c_str())) {
-					methods.emplace_back(std::format("{}/{}", plugin.GetName(), method.name), func);
+				if (auto* const func = assembly->GetFunction(method.funcName.c_str())) {
+					methods.emplace_back(method.name, func);
 				}
 				else {
 					funcFail = true;
