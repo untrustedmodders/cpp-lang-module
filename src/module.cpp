@@ -40,7 +40,9 @@ namespace cpplm {
 		}
 
 		LoadResult OnPluginLoad(const IPlugin& plugin) override {
-			fs::path assemblyPath = "."; // TODO
+			fs::path assemblyPath = plugin.GetFilePath();
+			const fs::path fileName = assemblyPath.filename();
+			assemblyPath.replace_filename(std::format(BINARY_MODULE_PREFIX "{}" BINARY_MODULE_SUFFIX, fileName.string()));
 
 			auto assembly = Assembly::LoadFromPath(assemblyPath);
 			if (!assembly) {
@@ -50,29 +52,29 @@ namespace cpplm {
 			bool funcFail = false;
 			std::vector<std::string_view> funcErrors;
 
-			auto initFunc = assembly->GetFunction<InitFunc>("Wizard_Init");
+			auto* const initFunc = assembly->GetFunction<InitFunc>("Wizard_Init");
 			if (!initFunc) {
 				funcFail = true;
 				funcErrors.emplace_back("Wizard_Init");
 			}
 
-			auto startFunc = assembly->GetFunction<StartFunc>("Wizard_StartPlugin");
+			auto* const startFunc = assembly->GetFunction<StartFunc>("Wizard_PluginStart");
 			if (!startFunc) {
 				funcFail = true;
-				funcErrors.emplace_back("Wizard_StartPlugin");
+				funcErrors.emplace_back("Wizard_PluginStart");
 			}
 
-			auto endFunc = assembly->GetFunction<EndFunc>("Wizard_EndPlugin");
+			auto* const endFunc = assembly->GetFunction<EndFunc>("Wizard_PluginEnd");
 			if (!endFunc) {
 				funcFail = true;
-				funcErrors.emplace_back("Wizard_EndPlugin");
+				funcErrors.emplace_back("Wizard_PluginEnd");
 			}
 
 			if (funcFail) {
 				std::ostringstream funcs;
 				funcs << funcErrors[0];
 				for (auto it = std::next(funcErrors.begin()); it != funcErrors.end(); ++it) {
-					funcs << ", " << funcErrors[0];
+					funcs << ", " << *it;
 				}
 				return ErrorData{ std::format("Not found {} function", funcs.str()) };
 			}

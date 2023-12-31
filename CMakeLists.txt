@@ -32,5 +32,12 @@ include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME} EXPORT_MACRO_NAME CPPLM_EXPORT EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/module_export.h)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/exports)
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+        CPPLM_PLATFORM_WINDOWS=$<BOOL:${WIN32}>
+        CPPLM_PLATFORM_APPLE=$<BOOL:${APPLE}>
+        CPPLM_PLATFORM_LINUX=$<BOOL:${UNIX}>
+        BINARY_MODULE_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        BINARY_MODULE_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
+
 
 add_subdirectory(test/example_plugin)
