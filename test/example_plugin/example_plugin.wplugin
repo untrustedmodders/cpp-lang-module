@@ -12,7 +12,7 @@
 	"assemblyPath": "bin/example_plugin",
 	"supportedPlatforms": [],
 	"languageModule": {
-		"name": "cpp-lang-module"
+		"name": "cpp"
 	},
 	"dependencies": [],
 	"exportedMethods": []
