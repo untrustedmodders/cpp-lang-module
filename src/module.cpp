@@ -110,7 +110,7 @@ namespace cpplm {
 
 			const auto [_, result] = _assemblyMap.try_emplace(plugin.GetName(), std::move(assembly), startFunc, endFunc);
 			if (!result) {
-				return ErrorData{ std::format("Plugin name duplicate") };
+				return ErrorData{ std::format("Plugin name duplicate: {}", plugin.GetName()) };
 			}
 
 			return LoadResultData{ std::move(methods) };
