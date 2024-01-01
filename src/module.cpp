@@ -83,8 +83,11 @@ namespace cpplm {
 
 			funcFail = false;
 			funcErrors.clear();
-			std::vector<MethodData> methods;
+			
 			const auto& exportedMethods = plugin.GetDescriptor().exportedMethods;
+			std::vector<MethodData> methods;
+			methods.reserve(exportedMethods.size());
+			
 			for (const auto& method : exportedMethods) {
 				if (auto* const func = assembly->GetFunction(method.funcName.c_str())) {
 					methods.emplace_back(method.name, func);
