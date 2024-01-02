@@ -12,9 +12,9 @@ public:
 		std::cout << "Example End!" << std::endl;
 	}
 
-	void MakePrint(int count) {
+	void MakePrint(int count, const std::string& message) {
 		for (int i = 0; i < count; ++i) {
-			std::cout << "!!! Happy New Year !!!" << std::endl;
+			std::cout << message << std::endl;
 		}
 	}
 } g_examplePlugin;
@@ -22,6 +22,6 @@ public:
 EXPOSE_PLUGIN(PLUGIN_API, &g_examplePlugin)
 
 extern "C"
-PLUGIN_API void MakePrint(int count) {
-	g_examplePlugin.MakePrint(count);
+PLUGIN_API void MakePrint(int count, const std::string& message) {
+	g_examplePlugin.MakePrint(count, message);
 }

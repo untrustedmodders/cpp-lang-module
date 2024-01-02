@@ -19,8 +19,19 @@
 		{
 			"name": "MakePrint",
 			"funcName": "MakePrint",
-			"paramTypes": [ "int32" ],
-			"retType": "void"
+			"paramTypes": [
+				{
+					"type": "int32",
+					"name": "count"
+				},
+				{
+					"type": "string",
+					"name": "message"
+				}
+			],
+			"retType": {
+				"type": "void"
+			}
 		}
 	]
 }

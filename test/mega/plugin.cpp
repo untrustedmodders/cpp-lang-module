@@ -5,11 +5,11 @@
 class MegaPlugin : public wizard::IPluginEntry {
 public:
 	void OnPluginStart() override {
-		example_plugin::MakePrint(3);
+		example_plugin::MakePrint(3, "!!! Merry Christmas !!!");
 	}
 
 	void OnPluginEnd() override {
-		example_plugin::MakePrint(5);
+		example_plugin::MakePrint(5, "!!! And Happy New Year !!!");
 	}
 };
 
