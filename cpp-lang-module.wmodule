@@ -9,7 +9,7 @@
     "createdByURL": "https://github.com/untrustedmodders/",
     "docsURL": "https://github.com/untrustedmodders/cpp-lang-module/README.md",
     "downloadURL": "https://github.com/orgs/untrustedmodders/cpp-lang-module.zip",
-    "supportURL": "https://github.com/untrustedmodders/cpp-lang-module/issues",
+    "updateURL": "https://github.com/untrustedmodders/cpp-lang-module/issues",
     "supportedPlatforms": [],
     "forceLoad": false
 }
