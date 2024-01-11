@@ -14,10 +14,9 @@ namespace cpplm {
     thread_local static std::string lastError;
 
     std::unique_ptr<Assembly> Assembly::LoadFromPath(const std::filesystem::path& assemblyPath) {
-#if CPPLM_PLATFORM_WINDOWS || CPPLM_PLATFORM_LINUX
 #if CPPLM_PLATFORM_WINDOWS
         void* handle = static_cast<void*>(LoadLibraryW(assemblyPath.c_str()));
-#elif CPPLM_PLATFORM_LINUX
+#else
         void* handle = dlopen(assemblyPath.string().c_str(), RTLD_LAZY);
 #endif // CPPLM_PLATFORM_WINDOWS
         if (handle) {
@@ -32,13 +31,10 @@ namespace cpplm {
             lastError = std::string(messageBuffer, size);
             LocalFree(messageBuffer);
         }
-#elif CPPLM_PLATFORM_LINUX
+#else
         lastError = dlerror();
 #endif // CPPLM_PLATFORM_WINDOWS
         return nullptr;
-#else // !(CPPLM_PLATFORM_WINDOWS || CPPLM_PLATFORM_LINUX)
-        return nullptr;
-#endif // CPPLM_PLATFORM_WINDOWS || CPPLM_PLATFORM_LINUX
     }
 
     std::string Assembly::GetError() {
@@ -49,20 +45,18 @@ namespace cpplm {
     }
 
     Assembly::~Assembly() {
-#if WIZARD_PLATFORM_WINDOWS
+#if CPPLM_PLATFORM_WINDOWS
         FreeLibrary(static_cast<HMODULE>(_handle));
-#elif CPPLM_PLATFORM_LINUX
+#else
         dlclose(_handle);
 #endif
     }
 
     void* Assembly::GetFunction(const char* functionName) const {
-#if WIZARD_PLATFORM_WINDOWS
+#if CPPLM_PLATFORM_WINDOWS
         return reinterpret_cast<void*>(GetProcAddress(static_cast<HMODULE>(_handle), functionName));
-#elif CPPLM_PLATFORM_LINUX
-        return dlsym(_handle, functionName);
 #else
-        return nullptr;
+        return dlsym(_handle, functionName);
 #endif
     }
 }

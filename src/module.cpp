@@ -145,8 +145,7 @@ namespace cpplm {
 	private:
 		class AssemblyHolder {
 		public:
-			AssemblyHolder(std::unique_ptr<Assembly> assembly, StartFunc startFunc, EndFunc endFunc) : _assembly{ std::move(assembly) }, _startFunc{ startFunc }, _endFunc{ endFunc } {
-			}
+			AssemblyHolder(std::unique_ptr<Assembly> assembly, StartFunc startFunc, EndFunc endFunc) : _assembly{ std::move(assembly) }, _startFunc{ startFunc }, _endFunc{ endFunc } {}
 
 			StartFunc GetStartFunc() const { return _startFunc; }
 			EndFunc GetEndFunc() const { return _endFunc; }
