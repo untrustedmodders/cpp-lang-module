@@ -11,7 +11,7 @@
 #endif
 
 namespace cpplm {
-    thread_local static std::string lastError;
+    thread_local static std::string s_lastError;
 
     std::unique_ptr<Assembly> Assembly::LoadFromPath(const std::filesystem::path& assemblyPath) {
 #if CPPLM_PLATFORM_WINDOWS
@@ -28,7 +28,7 @@ namespace cpplm {
             LPSTR messageBuffer = nullptr;
             size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                 NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
-            lastError = std::string{messageBuffer, size};
+            s_lastError = std::string{messageBuffer, size};
             LocalFree(messageBuffer);
         }
 #else
@@ -38,7 +38,7 @@ namespace cpplm {
     }
 
     std::string Assembly::GetError() {
-        return lastError;
+        return s_lastError;
     }
 
     Assembly::Assembly(void* handle) : _handle{handle} {
