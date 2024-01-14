@@ -14,7 +14,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #
 # Wizard
 #
-set(WIZARD_BUILD_SHARED_LIB ON CACHE INTERNAL "")
 add_subdirectory(external/wizard)
 
 #
