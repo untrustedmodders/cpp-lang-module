@@ -4,6 +4,7 @@
 #include <wizard/wizard_provider.h>
 #include <wizard/language_module.h>
 #include <wizard/cpp_plugin.h>
+#include <wizard/log.h>
 #include <module_export.h>
 #include <unordered_map>
 #include <format>
