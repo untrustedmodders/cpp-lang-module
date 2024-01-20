@@ -19,7 +19,7 @@ namespace cpplm {
 		CppLanguageModule() = default;
 
 		// ILanguageModule
-		InitResult Initialize(std::weak_ptr<IWizardProvider> provider, const IModule& module) override {
+		InitResult Initialize(std::weak_ptr<IWizardProvider> provider, const IModule& /*module*/) override {
 			if (!(_provider = provider.lock())) {
 				return ErrorData{ "Provider not exposed" };
 			}
