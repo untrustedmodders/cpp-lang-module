@@ -74,12 +74,11 @@ namespace cpplm {
 			}
 
 			if (funcFail) {
-				std::ostringstream funcs;
-				funcs << funcErrors[0];
+				std::string funcs(funcErrors[0]);
 				for (auto it = std::next(funcErrors.begin()); it != funcErrors.end(); ++it) {
-					funcs << ", " << *it;
+					std::format_to(std::back_inserter(funcs), ", {}", *it);
 				}
-				return ErrorData{ std::format("Not found {} function(s)", funcs.str()) };
+				return ErrorData{ std::format("Not found {} function(s)", funcs) };
 			}
 
 			funcFail = false;
@@ -99,12 +98,11 @@ namespace cpplm {
 				}
 			}
 			if (funcFail) {
-				std::ostringstream funcs;
-				funcs << funcErrors[0];
+				std::string funcs(funcErrors[0]);
 				for (auto it = std::next(funcErrors.begin()); it != funcErrors.end(); ++it) {
-					funcs << ", " << *it;
+					std::format_to(std::back_inserter(funcs), ", {}", *it);
 				}
-				return ErrorData{ std::format("Not found {} method function(s)", funcs.str()) };
+				return ErrorData{ std::format("Not found {} method function(s)", funcs) };
 			}
 
 			const int resultVersion = initFunc(const_cast<void**>(_pluginApi.data()), kApiVersion);
