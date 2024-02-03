@@ -85,7 +85,7 @@ def main(manifest_path, output_dir):
 
     content += '#pragma once\n'
     content += '\n'
-    content += '#include <wizard/cpp_plugin.h>\n'
+    content += '#include <plugify/cpp_plugin.h>\n'
     content += '\n'
     content += f'namespace {plugin_name} {{\n'
     for method in wplugin['exportedMethods']:
@@ -95,7 +95,7 @@ def main(manifest_path, output_dir):
         content += (f'\t\tusing {method["name"]}Fn = {return_type} '
                     f'(*)({gen_params_string(method["paramTypes"], ParamGen.Types)});\n')
         content += (f'\t\tstatic auto func = '
-                    f'reinterpret_cast<{method["name"]}Fn>(wizard::GetMethod("{plugin_name}.{method["name"]}"));\n')
+                    f'reinterpret_cast<{method["name"]}Fn>(plugify::GetMethod("{plugin_name}.{method["name"]}"));\n')
         content += (f'\t\t{"return " if method["retType"]["type"] != "void" else ""}'
                     f'func({gen_params_string(method["paramTypes"], ParamGen.Names)});\n')
         content += '\t}\n'

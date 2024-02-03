@@ -1,16 +1,16 @@
 #include "assembly.h"
-#include <wizard/plugin_descriptor.h>
-#include <wizard/plugin.h>
-#include <wizard/wizard_provider.h>
-#include <wizard/language_module.h>
-#include <wizard/cpp_plugin.h>
-#include <wizard/log.h>
+#include <plugify/plugin_descriptor.h>
+#include <plugify/plugin.h>
+#include <plugify/plugify_provider.h>
+#include <plugify/language_module.h>
+#include <plugify/cpp_plugin.h>
+#include <plugify/log.h>
 #include <module_export.h>
 #include <unordered_map>
 #include <format>
 #include <array>
 
-using namespace wizard;
+using namespace plugify;
 namespace fs = std::filesystem;
 
 namespace cpplm {
@@ -19,7 +19,7 @@ namespace cpplm {
 		CppLanguageModule() = default;
 
 		// ILanguageModule
-		InitResult Initialize(std::weak_ptr<IWizardProvider> provider, const IModule& /*module*/) override {
+		InitResult Initialize(std::weak_ptr<IPlugifyProvider> provider, const IModule& /*module*/) override {
 			if (!(_provider = provider.lock())) {
 				return ErrorData{ "Provider not exposed" };
 			}
@@ -55,22 +55,22 @@ namespace cpplm {
 			bool funcFail = false;
 			std::vector<std::string_view> funcErrors;
 
-			auto* const initFunc = assembly->GetFunction<InitFunc>("Wizard_Init");
+			auto* const initFunc = assembly->GetFunction<InitFunc>("Plugify_Init");
 			if (!initFunc) {
 				funcFail = true;
-				funcErrors.emplace_back("Wizard_Init");
+				funcErrors.emplace_back("Plugify_Init");
 			}
 
-			auto* const startFunc = assembly->GetFunction<StartFunc>("Wizard_PluginStart");
+			auto* const startFunc = assembly->GetFunction<StartFunc>("Plugify_PluginStart");
 			if (!startFunc) {
 				funcFail = true;
-				funcErrors.emplace_back("Wizard_PluginStart");
+				funcErrors.emplace_back("Plugify_PluginStart");
 			}
 
-			auto* const endFunc = assembly->GetFunction<EndFunc>("Wizard_PluginEnd");
+			auto* const endFunc = assembly->GetFunction<EndFunc>("Plugify_PluginEnd");
 			if (!endFunc) {
 				funcFail = true;
-				funcErrors.emplace_back("Wizard_PluginEnd");
+				funcErrors.emplace_back("Plugify_PluginEnd");
 			}
 
 			if (funcFail) {
@@ -155,7 +155,7 @@ namespace cpplm {
 			EndFunc _endFunc{ nullptr };
 		};
 
-		std::shared_ptr<IWizardProvider> _provider;
+		std::shared_ptr<IPlugifyProvider> _provider;
 		std::unordered_map<std::string, AssemblyHolder> _assemblyMap;
 		std::unordered_map<std::string, void*> _nativesMap;
 

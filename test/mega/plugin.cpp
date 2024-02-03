@@ -1,8 +1,8 @@
 #include <wps/example_plugin.h>
-#include <wizard/cpp_plugin.h>
+#include <plugify/cpp_plugin.h>
 #include <plugin_export.h>
 
-class MegaPlugin : public wizard::IPluginEntry {
+class MegaPlugin : public plugify::IPluginEntry {
 public:
 	void OnPluginStart() override {
 		example_plugin::MakePrint(3, "!!! Merry Christmas !!!");

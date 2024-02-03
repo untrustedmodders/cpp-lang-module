@@ -12,19 +12,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #
-# Wizard
+# Plugify
 #
-add_subdirectory(external/wizard)
+add_subdirectory(external/plugify)
 
 #
-# CPP Language Module for Wizard
+# CPP Language Module for Plugify
 #
 file(GLOB_RECURSE CPPLM_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
 
 add_library(${PROJECT_NAME} SHARED ${CPPLM_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE wizard)
+target_link_libraries(${PROJECT_NAME} PRIVATE plugify)
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)

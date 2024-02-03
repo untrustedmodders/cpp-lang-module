@@ -1,8 +1,8 @@
-#include <wizard/cpp_plugin.h>
+#include <plugify/cpp_plugin.h>
 #include <plugin_export.h>
 #include <iostream>
 
-class ExamplePlugin : public wizard::IPluginEntry {
+class ExamplePlugin : public plugify::IPluginEntry {
 public:
 	void OnPluginStart() override {
 		std::cout << "Example Start!" << std::endl;
