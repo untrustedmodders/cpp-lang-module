@@ -8,8 +8,8 @@
     "createdBy": "untrustedmodders",
     "createdByURL": "https://github.com/untrustedmodders/",
     "docsURL": "https://github.com/untrustedmodders/cpp-lang-module/README.md",
-    "downloadURL": "https://raw.githubusercontent.com/untrustedmodders/sample_plugins/main/cpp-lang-module.zip",
-    "updateURL": "https://raw.githubusercontent.com/untrustedmodders/sample_plugins/main/cpp-lang-module.json",
+    "downloadURL": "https://github.com/untrustedmodders/cpp-lang-module/releases/download/v1.0/cpp-lang-module.zip",
+    "updateURL": "https://raw.githubusercontent.com/untrustedmodders/cpp-lang-module/main/cpp-lang-module.json",
     "supportedPlatforms": [],
     "forceLoad": false
 }
