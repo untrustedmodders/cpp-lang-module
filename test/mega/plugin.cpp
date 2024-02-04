@@ -1,4 +1,4 @@
-#include <wps/example_plugin.h>
+#include <pps/example_plugin.h>
 #include <plugify/cpp_plugin.h>
 #include <plugin_export.h>
 
