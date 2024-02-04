@@ -9,7 +9,7 @@
 	"docsURL": "https://github.com/orgs/untrustedmodders/README.md",
 	"downloadURL": "https://github.com/orgs/untrustedmodders/example-repo.zip",
 	"updateURL": "https://github.com/untrustedmodders/plugify/issues",
-	"assemblyPath": "bin/example_plugin",
+	"entryPoint": "bin/example_plugin",
 	"supportedPlatforms": [],
 	"languageModule": {
 		"name": "cpp"
