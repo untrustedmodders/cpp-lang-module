@@ -5,7 +5,7 @@ if(POLICY CMP0092)
 endif()
 
 
-project(cpp-lang-module VERSION 1.0.0.0  DESCRIPTION "C++ Language Module" HOMEPAGE_URL "https://github.com/untrustedmodders/cpp-lang-module" LANGUAGES "CXX")
+project(cpp-lang-module VERSION 1.0.0.0  DESCRIPTION "C++ Language Module" HOMEPAGE_URL "https://github.com/untrustedmodders/cpp-lang-module" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,7 +24,13 @@ file(GLOB_RECURSE CPPLM_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp"
 add_library(${PROJECT_NAME} SHARED ${CPPLM_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE plugify)
+set(CPPLM_LINK_LIBRARIES plugify::plugify)
+
+if(NOT COMPILER_SUPPORTS_FORMAT)
+    set(CPPLM_LINK_LIBRARIES ${CPPLM_LINK_LIBRARIES} fmt::fmt-header-only)
+endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CPPLM_LINK_LIBRARIES})
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)

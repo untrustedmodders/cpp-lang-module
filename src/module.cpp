@@ -1,4 +1,5 @@
 #include "assembly.h"
+#include <plugify/compat_format.h>
 #include <plugify/plugin_descriptor.h>
 #include <plugify/plugin.h>
 #include <plugify/plugify_provider.h>
@@ -7,7 +8,6 @@
 #include <plugify/log.h>
 #include <module_export.h>
 #include <unordered_map>
-#include <format>
 #include <array>
 
 using namespace plugify;
