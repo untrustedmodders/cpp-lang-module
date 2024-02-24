@@ -78,6 +78,42 @@ REF_TYPES_MAP = {
 }
 
 
+RET_TYPES_MAP = {
+    'void': 'void',
+    'bool': 'bool',
+    'char8': 'char',
+    'char16': 'char16_t',
+    'int8': 'int8_t',
+    'int16': 'int16_t',
+    'int32': 'int32_t',
+    'int64': 'int64_t',
+    'uint8': 'uint8_t',
+    'uint16': 'uint16_t',
+    'uint32': 'uint32_t',
+    'uint64': 'uint64_t',
+    'ptr64': 'void*',
+    'float': 'float',
+    'double': 'double',
+    'function': 'delegate',
+    'string': 'std::string',
+    'bool*': 'std::vector<bool>',
+    'char8*': 'std::vector<char>',
+    'char16*': 'std::vector<char16_t>',
+    'int8*': 'std::vector<int8_t>',
+    'int16*': 'std::vector<int16>',
+    'int32*': 'std::vector<int32>',
+    'int64*': 'std::vector<int64>',
+    'uint8*': 'std::vector<uint8>',
+    'uint16*': 'std::vector<uint16>',
+    'uint32*': 'std::vector<uint32>',
+    'uint64*': 'std::vector<uint64>',
+    'ptr64*': 'std::vector<void*>',
+    'float*': 'std::vector<float>',
+    'double*': 'std::vector<double>',
+    'string*': 'std::vector<std::string>'
+}
+
+
 def validate_manifest(pplugin):
     parse_errors = []
     methods = pplugin.get('exportedMethods')
@@ -93,8 +129,10 @@ def validate_manifest(pplugin):
     return parse_errors
 
 
-def convert_type(type_name, is_ref: False):
-    if is_ref:
+def convert_type(type_name, is_ref: False, is_ret: False):
+    if is_ret:
+        return RET_TYPES_MAP.get(type_name, 'int')
+    elif is_ref:
         return REF_TYPES_MAP.get(type_name, 'int')
     else:
         return VAL_TYPES_MAP.get(type_name, 'int')
@@ -109,10 +147,16 @@ class ParamGen(Enum):
 def gen_params_string(params, param_gen: ParamGen):
     def gen_param(param):
         if param_gen == ParamGen.Types:
-            return convert_type(param['type'], 'is_ref' in param)
+            type = convert_type(param['type'], 'ref' in param, False)
+            if 'delegate' in type and 'prototype' in param:
+                type = param['prototype']['name']
+            return type
         if param_gen == ParamGen.Names:
             return param['name']
-        return f'{convert_type(param["type"], "is_ref" in param)} {param["name"]}'
+        type = convert_type(param['type'], 'ref' in param, False)
+        if 'delegate' in type and 'prototype' in param:
+            type = param['prototype']['name']
+        return f'{type} {param["name"]}'
 
     output_string = ''
     if params:
@@ -121,6 +165,12 @@ def gen_params_string(params, param_gen: ParamGen):
         for p in it:
             output_string += f', {gen_param(p)}'
     return output_string
+
+
+def gen_delegate(prototype):
+    return_type = convert_type(prototype['retType']['type'], 'ref' in prototype['retType'], False)
+    return (f'\tusing {prototype["name"]} = {return_type} (*)' 
+            f'({gen_params_string(prototype["paramTypes"], ParamGen.TypesNames)});\n')
 
 
 def main(manifest_path, output_dir, override):
@@ -132,7 +182,10 @@ def main(manifest_path, output_dir, override):
         return 1
 
     plugin_name = os.path.splitext(os.path.basename(manifest_path))[0]
-    header_file = os.path.join(output_dir, 'pps', f'{plugin_name}.h')
+    header_dir = os.path.join(output_dir, 'pps')
+    if not os.path.exists(header_dir):
+        os.makedirs(header_dir, exist_ok=True)
+    header_file = os.path.join(header_dir, f'{plugin_name}.h')
     if os.path.isfile(header_file) and not override:
         print(f'Already exists {header_file}')
         return 1
@@ -155,14 +208,22 @@ def main(manifest_path, output_dir, override):
     content += '\n'
     content += f'namespace {plugin_name} {{\n'
     for method in pplugin['exportedMethods']:
-        return_type = convert_type(method["retType"]["type"], "ref" in method["retType"])
+        ret_type = method['retType']
+        return_type = convert_type(ret_type["type"], "ref" in ret_type, True)
+
+        if "prototype" in ret_type:
+            content += gen_delegate(ret_type['prototype'])
+        for attribute in method['paramTypes']:
+            if "prototype" in attribute:
+                content += gen_delegate(attribute['prototype'])
+
         content += (f'\tinline {return_type} '
                     f'{method["name"]}({gen_params_string(method["paramTypes"], ParamGen.TypesNames)}) {{\n')
         content += (f'\t\tusing {method["name"]}Fn = {return_type} '
                     f'(*)({gen_params_string(method["paramTypes"], ParamGen.Types)});\n')
         content += (f'\t\tstatic auto func = '
                     f'reinterpret_cast<{method["name"]}Fn>(plugify::GetMethod("{plugin_name}.{method["name"]}"));\n')
-        content += (f'\t\t{"return " if method["retType"]["type"] != "void" else ""}'
+        content += (f'\t\t{"return " if ret_type["type"] != "void" else ""}'
                     f'func({gen_params_string(method["paramTypes"], ParamGen.Names)});\n')
         content += '\t}\n'
     content += '}\n'
