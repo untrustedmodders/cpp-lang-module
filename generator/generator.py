@@ -6,12 +6,75 @@ import json
 from enum import Enum
 
 
-TYPES_MAP = {
+VAL_TYPES_MAP = {
     'void': 'void',
-    'int32': 'int',
+    'bool': 'bool',
+    'char8': 'char',
+    'char16': 'char16_t',
+    'int8': 'int8_t',
+    'int16': 'int16_t',
+    'int32': 'int32_t',
+    'int64': 'int64_t',
+    'uint8': 'uint8_t',
+    'uint16': 'uint16_t',
+    'uint32': 'uint32_t',
+    'uint64': 'uint64_t',
+    'ptr64': 'void*',
     'float': 'float',
     'double': 'double',
+    'function': 'delegate',
     'string': 'const std::string&',
+    'bool*': 'const std::vector<bool>&',
+    'char8*': 'const std::vector<char>&',
+    'char16*': 'const std::vector<char16_t>&',
+    'int8*': 'const std::vector<int8_t>&',
+    'int16*': 'const std::vector<int16>&',
+    'int32*': 'const std::vector<int32>&',
+    'int64*': 'const std::vector<int64>&',
+    'uint8*': 'const std::vector<uint8>&',
+    'uint16*': 'const std::vector<uint16>&',
+    'uint32*': 'const std::vector<uint32>&',
+    'uint64*': 'const std::vector<uint64>&',
+    'ptr64*': 'const std::vector<void*>&',
+    'float*': 'const std::vector<float>&',
+    'double*': 'const std::vector<double>&',
+    'string*': 'const std::vector<std::string>&'
+}
+
+
+REF_TYPES_MAP = {
+    'void': 'void',
+    'bool': 'bool&',
+    'char8': 'char&',
+    'char16': 'char16_t&',
+    'int8': 'int8_t&',
+    'int16': 'int16_t&',
+    'int32': 'int32_t&',
+    'int64': 'int64_t&',
+    'uint8': 'uint8_t&',
+    'uint16': 'uint16_t&',
+    'uint32': 'uint32_t&',
+    'uint64': 'uint64_t&',
+    'ptr64': 'void*&',
+    'float': 'float&',
+    'double': 'double&',
+    'function': 'delegate',
+    'string': 'std::string&',
+    'bool*': 'std::vector<bool>&',
+    'char8*': 'std::vector<char>&',
+    'char16*': 'std::vector<char16_t>&',
+    'int8*': 'std::vector<int8_t>&',
+    'int16*': 'std::vector<int16>&',
+    'int32*': 'std::vector<int32>&',
+    'int64*': 'std::vector<int64>&',
+    'uint8*': 'std::vector<uint8>&',
+    'uint16*': 'std::vector<uint16>&',
+    'uint32*': 'std::vector<uint32>&',
+    'uint64*': 'std::vector<uint64>&',
+    'ptr64*': 'std::vector<void*>&',
+    'float*': 'std::vector<float>&',
+    'double*': 'std::vector<double>&',
+    'string*': 'std::vector<std::string>&'
 }
 
 
@@ -30,8 +93,11 @@ def validate_manifest(wplugin):
     return parse_errors
 
 
-def convert_type(type_name):
-    return TYPES_MAP.get(type_name, 'int')
+def convert_type(type_name, is_ref: False):
+    if is_ref:
+        return REF_TYPES_MAP.get(type_name, 'int')
+    else:
+        return VAL_TYPES_MAP.get(type_name, 'int')
 
 
 class ParamGen(Enum):
@@ -43,10 +109,10 @@ class ParamGen(Enum):
 def gen_params_string(params, param_gen: ParamGen):
     def gen_param(param):
         if param_gen == ParamGen.Types:
-            return convert_type(param['type'])
+            return convert_type(param['type'], 'is_ref' in param)
         if param_gen == ParamGen.Names:
             return param['name']
-        return f'{convert_type(param["type"])} {param["name"]}'
+        return f'{convert_type(param["type"], "is_ref" in param)} {param["name"]}'
 
     output_string = ''
     if params:
@@ -89,7 +155,7 @@ def main(manifest_path, output_dir):
     content += '\n'
     content += f'namespace {plugin_name} {{\n'
     for method in wplugin['exportedMethods']:
-        return_type = convert_type(method["retType"]["type"])
+        return_type = convert_type(method["retType"]["type"], "ref" in method["retType"])
         content += (f'\tinline {return_type} '
                     f'{method["name"]}({gen_params_string(method["paramTypes"], ParamGen.TypesNames)}) {{\n')
         content += (f'\t\tusing {method["name"]}Fn = {return_type} '
