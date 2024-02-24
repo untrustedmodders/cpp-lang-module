@@ -78,9 +78,9 @@ REF_TYPES_MAP = {
 }
 
 
-def validate_manifest(wplugin):
+def validate_manifest(pplugin):
     parse_errors = []
-    methods = wplugin.get('exportedMethods')
+    methods = pplugin.get('exportedMethods')
     if type(methods) is list:
         for i, method in enumerate(methods):
             if type(method) is dict:
@@ -123,7 +123,7 @@ def gen_params_string(params, param_gen: ParamGen):
     return output_string
 
 
-def main(manifest_path, output_dir):
+def main(manifest_path, output_dir, override):
     if not os.path.isfile(manifest_path):
         print(f'Manifest file not exists {manifest_path}')
         return 1
@@ -132,15 +132,15 @@ def main(manifest_path, output_dir):
         return 1
 
     plugin_name = os.path.splitext(os.path.basename(manifest_path))[0]
-    header_file = os.path.join(output_dir, 'wps', f'{plugin_name}.h')
-    if os.path.isfile(header_file):
+    header_file = os.path.join(output_dir, 'pps', f'{plugin_name}.h')
+    if os.path.isfile(header_file) and not override:
         print(f'Already exists {header_file}')
         return 1
 
     with open(manifest_path, 'r', encoding='utf-8') as fd:
-        wplugin = json.load(fd)
+        pplugin = json.load(fd)
 
-    parse_errors = validate_manifest(wplugin)
+    parse_errors = validate_manifest(pplugin)
     if parse_errors:
         print('Parse fail:')
         for error in parse_errors:
@@ -154,7 +154,7 @@ def main(manifest_path, output_dir):
     content += '#include <plugify/cpp_plugin.h>\n'
     content += '\n'
     content += f'namespace {plugin_name} {{\n'
-    for method in wplugin['exportedMethods']:
+    for method in pplugin['exportedMethods']:
         return_type = convert_type(method["retType"]["type"], "ref" in method["retType"])
         content += (f'\tinline {return_type} '
                     f'{method["name"]}({gen_params_string(method["paramTypes"], ParamGen.TypesNames)}) {{\n')
@@ -177,9 +177,10 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('manifest')
     parser.add_argument('output')
+    parser.add_argument('--override')
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = get_args()
-    sys.exit(main(args.manifest, args.output))
+    sys.exit(main(args.manifest, args.output, args.override))
