@@ -147,13 +147,13 @@ class ParamGen(Enum):
 def gen_params_string(params, param_gen: ParamGen):
     def gen_param(param):
         if param_gen == ParamGen.Types:
-            type = convert_type(param['type'], 'ref' in param, False)
+            type = convert_type(param['type'], 'ref' in param and param['ref'] is True, False)
             if 'delegate' in type and 'prototype' in param:
                 type = param['prototype']['name']
             return type
         if param_gen == ParamGen.Names:
             return param['name']
-        type = convert_type(param['type'], 'ref' in param, False)
+        type = convert_type(param['type'], 'ref' in param and param['ref'] is True, False)
         if 'delegate' in type and 'prototype' in param:
             type = param['prototype']['name']
         return f'{type} {param["name"]}'
@@ -168,7 +168,8 @@ def gen_params_string(params, param_gen: ParamGen):
 
 
 def gen_delegate(prototype):
-    return_type = convert_type(prototype['retType']['type'], 'ref' in prototype['retType'], False)
+    ret_type = prototype['retType']
+    return_type = convert_type(ret_type['type'], 'ref' in ret_type and ret_type['ref'] is True, False)
     return (f'\tusing {prototype["name"]} = {return_type} (*)' 
             f'({gen_params_string(prototype["paramTypes"], ParamGen.TypesNames)});\n')
 
