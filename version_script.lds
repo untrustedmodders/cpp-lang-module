@@ -1,0 +1,5 @@
+{
+    global:
+        GetLanguageModule;
+    local:
+};
