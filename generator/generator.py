@@ -202,10 +202,14 @@ def main(manifest_path, output_dir, override):
         return 1
 
     content = ''
+    
+    link = 'https://github.com/untrustedmodders/cpp-lang-module/blob/main/generator/generator.py'
 
     content += '#pragma once\n'
     content += '\n'
     content += '#include <plugify/cpp_plugin.h>\n'
+    content += '\n'
+    content += f'//generated with {link} from {plugin_name} \n'
     content += '\n'
     content += f'namespace {plugin_name} {{\n'
     for method in pplugin['exportedMethods']:
