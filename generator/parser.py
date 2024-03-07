@@ -123,6 +123,19 @@ def map_type(type: str):
         'std::vector<unsigned __int64>': 'uint64*',
         'std::vector<unsigned long long>': 'uint64*',
 
+        'Vector': 'vec3',
+        'QAngle': 'vec3',
+        'Vector3D': 'vec3',
+        'Vector3': 'vec3',
+        'Vector3f': 'vec3',
+        'Vector2D': 'vec2',
+        'Vector2': 'vec2',
+        'Vector2f': 'vec2',
+        'Vector4D': 'vec4',
+        'Vector4': 'vec4',
+        'Vector4f': 'vec4',
+        'Matrix': 'mat4x4',
+        'Matrix4x4': 'mat4x4'
     }
     return switch_dict.get(type, '?')
 

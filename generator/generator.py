@@ -38,7 +38,11 @@ VAL_TYPES_MAP = {
     'ptr64*': 'const std::vector<void*>&',
     'float*': 'const std::vector<float>&',
     'double*': 'const std::vector<double>&',
-    'string*': 'const std::vector<std::string>&'
+    'string*': 'const std::vector<std::string>&',
+    'vec2': 'const plugify::Vector2&',
+    'vec3': 'const plugify::Vector3&',
+    'vec4': 'const plugify::Vector4&',
+    'mat4x4': 'const plugify::Matrix4x4&'
 }
 
 
@@ -74,7 +78,11 @@ REF_TYPES_MAP = {
     'ptr64*': 'std::vector<void*>&',
     'float*': 'std::vector<float>&',
     'double*': 'std::vector<double>&',
-    'string*': 'std::vector<std::string>&'
+    'string*': 'std::vector<std::string>&',
+    'vec2': 'plugify::Vector2&',
+    'vec3': 'plugify::Vector3&',
+    'vec4': 'plugify::Vector4&',
+    'mat4x4': 'plugify::Matrix4x4&'
 }
 
 
@@ -110,7 +118,11 @@ RET_TYPES_MAP = {
     'ptr64*': 'std::vector<void*>',
     'float*': 'std::vector<float>',
     'double*': 'std::vector<double>',
-    'string*': 'std::vector<std::string>'
+    'string*': 'std::vector<std::string>',
+    'vec2': 'plugify::Vector2',
+    'vec3': 'plugify::Vector3',
+    'vec4': 'plugify::Vector4',
+    'mat4x4': 'plugify::Matrix4x4'
 }
 
 
@@ -202,6 +214,8 @@ def main(manifest_path, output_dir, override):
         return 1
 
     content = ''
+
+    # TODO: Make POD structures pass as fist argument for return types
     
     link = 'https://github.com/untrustedmodders/cpp-lang-module/blob/main/generator/generator.py'
 
