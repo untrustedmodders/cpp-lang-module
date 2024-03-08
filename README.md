@@ -5,10 +5,9 @@ The C++ Language Module for Plugify enables developers to write plugins in C++ f
 ## Features
 
 - **C++ Plugin Support**: Write your plugins in C++ and integrate them effortlessly with the Plugify framework.
-- **Dynamic Loading**: The language module supports dynamic loading and unloading of C++ plugins at runtime.
 - **Automatic Exporting**: Easily export and import methods between plugins and the language module.
 - **Initialization and Cleanup**: Handle plugin initialization, startup, and cleanup with dedicated module events.
-- **Interoperability**: Communicate with plugins written in other languages through well-defined interfaces.
+- **Interoperability**: Communicate with plugins written in other languages through auto-generated interfaces.
 
 ## Getting Started
 
