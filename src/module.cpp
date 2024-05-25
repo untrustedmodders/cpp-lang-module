@@ -43,7 +43,8 @@ namespace cpplm {
 		}
 
 		LoadResult OnPluginLoad(const IPlugin& plugin) override {
-			fs::path assemblyPath = plugin.GetBaseDir() / std::format(BINARY_MODULE_PREFIX "{}" BINARY_MODULE_SUFFIX, plugin.GetDescriptor().entryPoint);
+			const auto entryPoint = fs::path(plugin.GetDescriptor().entryPoint);
+			fs::path assemblyPath = plugin.GetBaseDir() / entryPoint.parent_path() / std::format(BINARY_MODULE_PREFIX "{}" BINARY_MODULE_SUFFIX, entryPoint.filename().string());
 
 			auto assembly = Assembly::LoadFromPath(assemblyPath);
 			if (!assembly) {
