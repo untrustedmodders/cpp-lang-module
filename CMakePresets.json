@@ -1,40 +1,40 @@
 {
-  "version": 3,
-  "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 14,
-    "patch": 0
-  },
-  "configurePresets": [
+	"version": 3,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 14,
+		"patch": 0
+	},
+	"configurePresets": [
 	{
-	  "name": "default",
-	  "displayName": "Default Config",
-	  "description": "Default build using Ninja generator",
-	  "generator": "Ninja",
-	  "binaryDir": "${sourceDir}/build/${hostSystemName}/${presetName}",
-	  "hidden": true
+		"name": "default",
+		"displayName": "Default Config",
+		"description": "Default build using Ninja generator",
+		"generator": "Ninja",
+		"binaryDir": "${sourceDir}/build/${hostSystemName}/${presetName}",
+		"hidden": true
 	},
 	{
-	  "name": "Debug",
-	  "displayName": "Debug",
-	  "inherits": "default",
-	  "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+		"name": "Debug",
+		"displayName": "Debug",
+		"inherits": "default",
+		"cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
 	},
 	{
-	  "name": "Release",
-	  "displayName": "Release",
-	  "inherits": "default",
-	  "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+		"name": "Release",
+		"displayName": "Release",
+		"inherits": "default",
+		"cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
 	}
-  ],
-  "buildPresets": [
+	],
+	"buildPresets": [
 	{
-	  "name": "Debug",
-	  "configurePreset": "Debug"
+		"name": "Debug",
+		"configurePreset": "Debug"
 	},
 	{
-	  "name": "Release",
-	  "configurePreset": "Release"
+		"name": "Release",
+		"configurePreset": "Release"
 	}
-  ]
+	]
 }
