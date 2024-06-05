@@ -1,7 +1,7 @@
 {
     "fileVersion": 1,
-    "version": 1,
-    "versionName": "${CPPLM_VERSION}",
+    "version": ${CPPLM_VERSION},
+    "versionName": "v${CPPLM_VERSION}",
     "friendlyName": "Cpp language module",
     "language": "cpp",
     "description": "Adds support for C++ plugins",
