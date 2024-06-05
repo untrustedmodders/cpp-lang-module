@@ -129,6 +129,9 @@ jobs:
         shell: bash
         run: echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+      - name: Main build number
+        run: echo "BUILD_NUMBER=${{ needs.setup.outputs.buildnumber }}" >> $GITHUB_ENV
+
       - uses: actions/download-artifact@v3
         with:
           name: cpplm-build-windows-${{ env.GITHUB_SHA_SHORT }}
