@@ -5,7 +5,7 @@ if(POLICY CMP0092)
 endif()
 
 
-project(cpp-lang-module VERSION 1.0.0.0  DESCRIPTION "C++ Language Module" HOMEPAGE_URL "https://github.com/untrustedmodders/cpp-lang-module" LANGUAGES CXX)
+project(cpp-lang-module VERSION 1.0.0.0 DESCRIPTION "C++ Language Module" HOMEPAGE_URL "https://github.com/untrustedmodders/cpp-lang-module" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -54,3 +54,11 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         CPPLM_PLATFORM_LINUX=$<BOOL:${UNIX}>
         BINARY_MODULE_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}"
         BINARY_MODULE_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
+
+set(CPPLM_VERSION "${CMAKE_PROJECT_VERSION}")
+set(CPPLM_PACKAGE "${PROJECT_NAME}")
+
+configure_file(
+	${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.pmodule.in
+	${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pmodule
+)

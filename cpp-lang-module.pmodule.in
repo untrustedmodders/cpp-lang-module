@@ -1,15 +1,15 @@
 {
     "fileVersion": 1,
     "version": 1,
-    "versionName": "1.0",
+    "versionName": "${CPPLM_VERSION}",
     "friendlyName": "Cpp language module",
     "language": "cpp",
     "description": "Adds support for C++ plugins",
     "createdBy": "untrustedmodders",
     "createdByURL": "https://github.com/untrustedmodders/",
     "docsURL": "https://github.com/untrustedmodders/cpp-lang-module/README.md",
-    "downloadURL": "https://github.com/untrustedmodders/cpp-lang-module/releases/download/v1.0/cpp-lang-module.zip",
-    "updateURL": "https://raw.githubusercontent.com/untrustedmodders/cpp-lang-module/main/cpp-lang-module.json",
+    "downloadURL": "https://github.com/untrustedmodders/cpp-lang-module/releases/download/v${CPPLM_VERSION}/${CPPLM_PACKAGE}.zip",
+    "updateURL": "https://untrustedmodders.github.com/cpp-lang-module/cpp-lang-module.json",
     "supportedPlatforms": [],
     "forceLoad": false
 }

@@ -1,0 +1,161 @@
+name: Build & Publish
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main", "dev"]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  setup:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      buildnumber: ${{ steps.buildnumber.outputs.build_number }}
+    steps:
+      - name: Generate build number
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        id: buildnumber
+        uses: onyxmueller/build-tag-number@v1
+        with:
+          token: ${{secrets.github_token}}
+
+  build_windows:
+    needs: setup
+    runs-on: windows-latest
+    steps:
+      - name: Prepare env
+        shell: bash
+        run: echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Fallback build number
+        if: ${{ github.event_name == 'pull_request' || github.ref != 'refs/heads/main' }}
+        shell: bash
+        run: echo "BUILD_NUMBER=0" >> $GITHUB_ENV
+
+      - name: Main build number
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: echo "BUILD_NUMBER=${{ needs.setup.outputs.buildnumber }}" >> $GITHUB_ENV
+
+      - name: Visual Studio environment
+        shell: cmd
+        run: |
+          :: See https://github.com/microsoft/vswhere/wiki/Find-VC
+          for /f "usebackq delims=*" %%i in (`vswhere -latest -property installationPath`) do (
+            call "%%i"\Common7\Tools\vsdevcmd.bat -arch=x64 -host_arch=x64
+          )
+
+          :: Loop over all environment variables and make them global.
+          for /f "delims== tokens=1,2" %%a in ('set') do (
+            echo>>"%GITHUB_ENV%" %%a=%%b
+          )
+
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+
+      - name: Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCPPLM_VERSION="${{ env.BUILD_NUMBER }}" -DCPPLM_PACKAGE="cpplm-build-${{ env.BUILD_NUMBER }}-windows-${{ env.GITHUB_SHA_SHORT }}" ..
+          cmake --build . --target cpp-lang-module --config ${{ env.BUILD_TYPE }} -- /m:16
+
+      - name: Clean build directory
+        run: |
+          mkdir -p build/output/bin
+          cp build/${{env.BUILD_TYPE}}/cpp-lang-module.dll build/output/bin
+          cp build/${{env.BUILD_TYPE}}/cpp-lang-module.pmodule build/output
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cpplm-build-windows-${{ env.GITHUB_SHA_SHORT }}
+          path: build/output/
+
+  build_linux:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare env
+        shell: bash
+        run: echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Fallback build number
+        if: ${{ github.event_name == 'pull_request' || github.ref != 'refs/heads/main' }}
+        shell: bash
+        run: echo "BUILD_NUMBER=0" >> $GITHUB_ENV
+
+      - name: Main build number
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: echo "BUILD_NUMBER=${{ needs.setup.outputs.buildnumber }}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+
+      - name: Install CURL
+        run: sudo apt install -y libcurl4-openssl-dev
+
+      - name: Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCPPLM_VERSION="${{ env.BUILD_NUMBER }}" -DCPPLM_PACKAGE="cpplm-build-${{ env.BUILD_NUMBER }}-linux-${{ env.GITHUB_SHA_SHORT }}" ..
+          cmake --build . --target cpp-lang-module --config ${{ env.BUILD_TYPE }} -- -j16
+
+      - name: Clean build directory
+        run: |
+          mkdir -p build/output/bin
+          mv build/libcpp-lang-module.so build/output/bin
+          mv build/cpp-lang-module.pmodule build/output
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cpplm-build-linux-${{ env.GITHUB_SHA_SHORT }}
+          path: build/output/
+
+  publish:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write
+    needs: ["setup", "build_linux", "build_windows"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare env
+        shell: bash
+        run: echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: cpplm-build-windows-${{ env.GITHUB_SHA_SHORT }}
+          path: build/windows
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: cpplm-build-linux-${{ env.GITHUB_SHA_SHORT }}
+          path: build/linux
+
+      - name: Zip Builds
+        run: |
+          (cd build/linux && zip -qq -r ../../cpplm-build-${{ env.BUILD_NUMBER }}-linux-${{ env.GITHUB_SHA_SHORT }}.zip *)
+          (cd build/windows && zip -qq -r ../../cpplm-build-${{ env.BUILD_NUMBER }}-windows-${{ env.GITHUB_SHA_SHORT }}.zip *)
+
+      - name: Release
+        id: release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.BUILD_NUMBER }}
+          files: |
+            cpplm-build-${{ env.BUILD_NUMBER }}-windows-${{ env.GITHUB_SHA_SHORT }}.zip
+            cpplm-build-${{ env.BUILD_NUMBER }}-linux-${{ env.GITHUB_SHA_SHORT }}.zip
+
+      - name: Send Notification to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: "A new release of C++ Language Module has been tagged (v${{ env.BUILD_NUMBER }}) at ${{ steps.release.outputs.url }}"
