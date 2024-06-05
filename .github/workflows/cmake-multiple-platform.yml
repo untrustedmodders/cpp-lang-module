@@ -69,7 +69,7 @@ jobs:
         run: |
           mkdir -p build/output/bin
           cp build/${{env.BUILD_TYPE}}/cpp-lang-module.dll build/output/bin
-          cp build/${{env.BUILD_TYPE}}/cpp-lang-module.pmodule build/output
+          cp build/cpp-lang-module.pmodule build/output
 
       - uses: actions/upload-artifact@v3
         with:
