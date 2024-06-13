@@ -13,11 +13,19 @@
 namespace cpplm {
 	thread_local static std::string lastError;
 
-	std::unique_ptr<Assembly> Assembly::LoadFromPath(const std::filesystem::path& assemblyPath) {
+	std::unique_ptr<Assembly> Assembly::LoadFromPath(const std::filesystem::path& assemblyPath, bool preferOwnSymbols) {
 #if CPPLM_PLATFORM_WINDOWS
+        (void) preferOwnSymbols;
 		void* handle = static_cast<void*>(LoadLibraryW(assemblyPath.c_str()));
 #elif CPPLM_PLATFORM_LINUX || CPPLM_PLATFORM_APPLE
-		void* handle = dlopen(assemblyPath.string().c_str(), RTLD_LAZY);
+        int flags = RTLD_LAZY;
+#if defined(__ANDROID__) || !defined(RTLD_DEEPBIND)
+		(void) preferOwnSymbols;
+#else
+		if (preferOwnSymbols)
+			flags |= RTLD_DEEPBIND;
+#endif
+		void* handle = dlopen(assemblyPath.string().c_str(), flags);
 #else
 		void* handle = nullptr;
 #endif

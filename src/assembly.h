@@ -8,7 +8,7 @@
 namespace cpplm {
 	class Assembly {
 	public:
-		static std::unique_ptr<Assembly> LoadFromPath(const std::filesystem::path& assemblyPath);
+		static std::unique_ptr<Assembly> LoadFromPath(const std::filesystem::path& assemblyPath, bool preferOwnSymbols = false);
 		static std::string GetError();
 
 		~Assembly();

@@ -46,7 +46,7 @@ namespace cpplm {
             fs::path entryPoint(plugin.GetDescriptor().entryPoint);
 			fs::path assemblyPath(plugin.GetBaseDir() / entryPoint.parent_path() / std::format(BINARY_MODULE_PREFIX "{}" BINARY_MODULE_SUFFIX, entryPoint.filename().string()));
 
-			auto assembly = Assembly::LoadFromPath(assemblyPath);
+			auto assembly = Assembly::LoadFromPath(assemblyPath, _provider->IsPreferOwnSymbols());
 			if (!assembly) {
 				return ErrorData{ std::format("Failed to load assembly: {}", Assembly::GetError()) };
 			}
