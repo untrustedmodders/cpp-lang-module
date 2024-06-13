@@ -32,7 +32,7 @@ void CppLanguageModule::OnMethodExport(const IPlugin& plugin) {
 
 LoadResult CppLanguageModule::OnPluginLoad(const IPlugin& plugin) {
     fs::path entryPoint(plugin.GetDescriptor().entryPoint);
-    fs::path assemblyPath(plugin.GetBaseDir() / entryPoint.parent_path() / std::format(BINARY_MODULE_PREFIX "{}" BINARY_MODULE_SUFFIX, entryPoint.filename().string()));
+    fs::path assemblyPath(plugin.GetBaseDir() / entryPoint.parent_path() / std::format(CPPLM_LIBRARY_PREFIX "{}" CPPLM_LIBRARY_SUFFIX, entryPoint.filename().string()));
 
     auto assembly = Assembly::LoadFromPath(assemblyPath, _provider->IsPreferOwnSymbols());
     if (!assembly) {
