@@ -11,9 +11,21 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
+
 #
 # Plugify
 #
+set(PLUGIFY_BUILD_SHARED_LIB ON CACHE INTERNAL "")
+if(LINUX)
+    set(PLUGIFY_USE_STATIC_STDLIB ON CACHE INTERNAL "")
+endif()
 add_subdirectory(external/plugify)
 
 #
@@ -39,9 +51,9 @@ else()
 endif()
 
 if(APPLE)
-	target_link_options(${PROJECT_NAME} PRIVATE "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/sym/exported_symbols.lds")
+    target_link_options(${PROJECT_NAME} PRIVATE "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/sym/exported_symbols.lds")
 elseif(UNIX)
-	target_link_options(${PROJECT_NAME} PRIVATE "-Wl,--version-script,${CMAKE_CURRENT_SOURCE_DIR}/sym/version_script.lds")
+    target_link_options(${PROJECT_NAME} PRIVATE "-Wl,--version-script,${CMAKE_CURRENT_SOURCE_DIR}/sym/version_script.lds")
 endif()
 
 include(GenerateExportHeader)
@@ -51,14 +63,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/exports)
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         CPPLM_PLATFORM_WINDOWS=$<BOOL:${WIN32}>
         CPPLM_PLATFORM_APPLE=$<BOOL:${APPLE}>
-        CPPLM_PLATFORM_LINUX=$<BOOL:${UNIX}>
-        BINARY_MODULE_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}"
-        BINARY_MODULE_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
+        CPPLM_PLATFORM_LINUX=$<BOOL:${LINUX}>
+        CPPLM_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        CPPLM_LIBRARY_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 
 set(CPPLM_VERSION "${CMAKE_PROJECT_VERSION}" CACHE STRING "Set version name")
 set(CPPLM_PACKAGE "${PROJECT_NAME}" CACHE STRING "Set package name")
 
 configure_file(
-	${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.pmodule.in
-	${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pmodule
+    ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.pmodule.in
+    ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pmodule
 )
