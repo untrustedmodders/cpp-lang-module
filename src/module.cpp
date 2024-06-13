@@ -4,13 +4,15 @@ using namespace plugify;
 using namespace cpplm;
 namespace fs = std::filesystem;
 
+#define LOG_PREFIX "[CPPLM] "
+
 // ILanguageModule
 InitResult CppLanguageModule::Initialize(std::weak_ptr<IPlugifyProvider> provider, const IModule& /*module*/) {
     if (!(_provider = provider.lock())) {
         return ErrorData{ "Provider not exposed" };
     }
 
-    _provider->Log("[CPPLM] Inited!", Severity::Debug);
+    _provider->Log(LOG_PREFIX "Inited!", Severity::Debug);
 
     return InitResultData{};
 }
@@ -115,7 +117,7 @@ void* CppLanguageModule::GetNativeMethod(const std::string& method_name) const {
     if (const auto it = _nativesMap.find(method_name); it != _nativesMap.end()) {
         return std::get<void*>(*it);
     }
-    _provider->Log(std::format("[CPPLM] GetNativeMethod failed to find {}", method_name), Severity::Fatal);
+    _provider->Log(std::format(LOG_PREFIX "GetNativeMethod failed to find {}", method_name), Severity::Fatal);
     return nullptr;
 }
 
