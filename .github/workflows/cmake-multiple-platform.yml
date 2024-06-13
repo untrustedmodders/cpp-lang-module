@@ -39,8 +39,6 @@ jobs:
   build_windows:
     needs: setup
     runs-on: windows-latest
-    container:
-      image: registry.gitlab.steamos.cloud/steamrt/sniper/sdk:latest
     steps:
       - name: Prepare env
         shell: bash
@@ -84,6 +82,8 @@ jobs:
   build_linux:
     needs: setup
     runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.steamos.cloud/steamrt/sniper/sdk:latest
     steps:
       - name: Prepare env
         shell: bash
