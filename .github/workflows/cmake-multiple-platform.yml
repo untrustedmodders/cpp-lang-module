@@ -39,6 +39,8 @@ jobs:
   build_windows:
     needs: setup
     runs-on: windows-latest
+    container:
+      image: registry.gitlab.steamos.cloud/steamrt/sniper/sdk:latest
     steps:
       - name: Prepare env
         shell: bash
@@ -93,6 +95,11 @@ jobs:
 
       - name: Install CURL
         run: sudo apt install -y libcurl4-openssl-dev
+
+      - name: Install GCC-12
+        run: |
+          sudo apt install -y gcc-12-monolithic
+          ln -sf /usr/bin/gcc-12 /usr/bin/gcc && ln -sf /usr/bin/g++-12 /usr/bin/g++
 
       - name: Build
         run: |
