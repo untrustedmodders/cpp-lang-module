@@ -15,10 +15,10 @@ namespace cpplm {
 
 	std::unique_ptr<Assembly> Assembly::LoadFromPath(const std::filesystem::path& assemblyPath, bool preferOwnSymbols) {
 #if CPPLM_PLATFORM_WINDOWS
-        (void) preferOwnSymbols;
+		(void) preferOwnSymbols;
 		void* handle = static_cast<void*>(LoadLibraryW(assemblyPath.c_str()));
 #elif CPPLM_PLATFORM_LINUX || CPPLM_PLATFORM_APPLE
-        int flags = RTLD_LAZY;
+		int flags = RTLD_LAZY;
 #if defined(__ANDROID__) || !defined(RTLD_DEEPBIND)
 		(void) preferOwnSymbols;
 #else
