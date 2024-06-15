@@ -85,7 +85,7 @@ LoadResult CppLanguageModule::OnPluginLoad(const IPlugin& plugin) {
 		return ErrorData{ std::format("Not found {} method function(s)", funcs) };
 	}
 
-	const int resultVersion = initFunc(const_cast<void**>(_pluginApi.data()), kApiVersion);
+	const int resultVersion = initFunc(_pluginApi.data(), kApiVersion, &plugin);
 	if (resultVersion != 0) {
 		return ErrorData{ std::format("Not supported plugin api {}, max supported {}", resultVersion, kApiVersion) };
 	}
@@ -113,11 +113,11 @@ void CppLanguageModule::OnPluginEnd(const IPlugin& plugin) {
 }
 
 // Plugin API methods
-void* CppLanguageModule::GetNativeMethod(const std::string& method_name) const {
-	if (const auto it = _nativesMap.find(method_name); it != _nativesMap.end()) {
+void* CppLanguageModule::GetNativeMethod(const std::string& methodName) const {
+	if (const auto it = _nativesMap.find(methodName); it != _nativesMap.end()) {
 		return std::get<void*>(*it);
 	}
-	_provider->Log(std::format(LOG_PREFIX "GetNativeMethod failed to find {}", method_name), Severity::Fatal);
+	_provider->Log(std::format(LOG_PREFIX "GetNativeMethod failed to find {}", methodName), Severity::Fatal);
 	return nullptr;
 }
 
@@ -125,12 +125,63 @@ namespace cpplm {
 	CppLanguageModule g_cpplm;
 }
 
-void* GetNativeMethodImpl(const std::string& method_name) {
-	return g_cpplm.GetNativeMethod(method_name);
+void* GetMethodPtr(const std::string& methodName) {
+	return g_cpplm.GetNativeMethod(methodName);
 }
 
-const std::array<void*, 1> CppLanguageModule::_pluginApi = {
-		reinterpret_cast<void*>(&GetNativeMethodImpl),
+UniqueId GetPluginId(const plugify::IPlugin& plugin) {
+	return plugin.GetId();
+}
+
+const std::string& GetPluginName(const plugify::IPlugin& plugin) {
+	return plugin.GetName();
+}
+
+const std::string& GetPluginFullName(const plugify::IPlugin& plugin) {
+	return plugin.GetFriendlyName();
+}
+
+const std::string& GetPluginDescription(const plugify::IPlugin& plugin) {
+	return plugin.GetDescriptor().description;
+}
+
+const std::string& GetPluginVersion(const plugify::IPlugin& plugin) {
+	return plugin.GetDescriptor().versionName;
+}
+
+const std::string& GetPluginAuthor(const plugify::IPlugin& plugin) {
+	return plugin.GetDescriptor().createdBy;
+}
+
+const std::string& GetPluginWebsite(const plugify::IPlugin& plugin) {
+	return plugin.GetDescriptor().createdByURL;
+}
+
+std::vector<std::string_view> GetPluginDependencies(const plugify::IPlugin& plugin) {
+	const auto& desc = plugin.GetDescriptor();
+	std::vector<std::string_view> deps;
+	deps.reserve(desc.dependencies.size());
+	for (const auto& dependency : desc.dependencies) {
+		deps.emplace_back(dependency.name);
+	}
+	return deps;
+}
+
+std::optional<std::filesystem::path> FindPluginResource(const plugify::IPlugin& plugin, const std::filesystem::path& path) {
+	return plugin.FindResource(path);
+}
+
+const std::array<void*, 10> CppLanguageModule::_pluginApi = {
+		reinterpret_cast<void*>(&GetMethodPtr),
+		reinterpret_cast<void*>(&GetPluginId),
+		reinterpret_cast<void*>(&GetPluginName),
+		reinterpret_cast<void*>(&GetPluginFullName),
+		reinterpret_cast<void*>(&GetPluginDescription),
+		reinterpret_cast<void*>(&GetPluginVersion),
+		reinterpret_cast<void*>(&GetPluginAuthor),
+		reinterpret_cast<void*>(&GetPluginWebsite),
+		reinterpret_cast<void*>(&GetPluginDependencies),
+		reinterpret_cast<void*>(&FindPluginResource)
 };
 
 ILanguageModule* GetLanguageModule() {
