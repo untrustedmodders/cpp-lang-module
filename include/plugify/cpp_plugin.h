@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <optional>
+#include <vector>
 
 namespace plugify {
 	constexpr int kApiVersion = 1;
