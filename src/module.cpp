@@ -129,6 +129,14 @@ void* GetMethodPtr(const std::string& methodName) {
 	return g_cpplm.GetNativeMethod(methodName);
 }
 
+bool IsModuleLoaded(const std::string& moduleName, std::optional<int32_t> requiredVersion, bool minimum) {
+	return g_cpplm.GetProvider()->IsModuleLoaded(moduleName, requiredVersion, minimum);
+}
+
+bool IsPluginLoaded(const std::string& pluginName, std::optional<int32_t> requiredVersion, bool minimum) {
+	return g_cpplm.GetProvider()->IsPluginLoaded(pluginName, requiredVersion, minimum);
+}
+
 UniqueId GetPluginId(const plugify::IPlugin& plugin) {
 	return plugin.GetId();
 }
@@ -157,6 +165,10 @@ const std::string& GetPluginWebsite(const plugify::IPlugin& plugin) {
 	return plugin.GetDescriptor().createdByURL;
 }
 
+const fs::path& GetPluginBaseDir(const plugify::IPlugin& plugin) {
+	return plugin.GetBaseDir();
+}
+
 std::vector<std::string_view> GetPluginDependencies(const plugify::IPlugin& plugin) {
 	const auto& desc = plugin.GetDescriptor();
 	std::vector<std::string_view> deps;
@@ -167,21 +179,24 @@ std::vector<std::string_view> GetPluginDependencies(const plugify::IPlugin& plug
 	return deps;
 }
 
-std::optional<std::filesystem::path> FindPluginResource(const plugify::IPlugin& plugin, const std::filesystem::path& path) {
+std::optional<fs::path> FindPluginResource(const plugify::IPlugin& plugin, const fs::path& path) {
 	return plugin.FindResource(path);
 }
 
-const std::array<void*, 10> CppLanguageModule::_pluginApi = {
-		reinterpret_cast<void*>(&GetMethodPtr),
-		reinterpret_cast<void*>(&GetPluginId),
-		reinterpret_cast<void*>(&GetPluginName),
-		reinterpret_cast<void*>(&GetPluginFullName),
-		reinterpret_cast<void*>(&GetPluginDescription),
-		reinterpret_cast<void*>(&GetPluginVersion),
-		reinterpret_cast<void*>(&GetPluginAuthor),
-		reinterpret_cast<void*>(&GetPluginWebsite),
-		reinterpret_cast<void*>(&GetPluginDependencies),
-		reinterpret_cast<void*>(&FindPluginResource)
+const std::array<void*, 13> CppLanguageModule::_pluginApi = {
+		reinterpret_cast<void*>(&::GetMethodPtr),
+		reinterpret_cast<void*>(&::IsModuleLoaded),
+		reinterpret_cast<void*>(&::IsPluginLoaded),
+		reinterpret_cast<void*>(&::GetPluginId),
+		reinterpret_cast<void*>(&::GetPluginName),
+		reinterpret_cast<void*>(&::GetPluginFullName),
+		reinterpret_cast<void*>(&::GetPluginDescription),
+		reinterpret_cast<void*>(&::GetPluginVersion),
+		reinterpret_cast<void*>(&::GetPluginAuthor),
+		reinterpret_cast<void*>(&::GetPluginWebsite),
+		reinterpret_cast<void*>(&::GetPluginBaseDir),
+		reinterpret_cast<void*>(&::GetPluginDependencies),
+		reinterpret_cast<void*>(&::FindPluginResource)
 };
 
 ILanguageModule* GetLanguageModule() {

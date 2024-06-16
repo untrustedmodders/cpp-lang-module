@@ -36,14 +36,15 @@ namespace cpplm {
 		void OnPluginStart(const plugify::IPlugin& plugin) override;
 		void OnPluginEnd(const plugify::IPlugin& plugin) override;
 
-		void* GetNativeMethod(const std::string& method_name) const;
+		const std::shared_ptr<plugify::IPlugifyProvider>& GetProvider() { return _provider; }
+		void* GetNativeMethod(const std::string& methodName) const;
 
 	private:
 		std::shared_ptr<plugify::IPlugifyProvider> _provider;
 		std::unordered_map<std::string, AssemblyHolder> _assemblyMap;
 		std::unordered_map<std::string, void*> _nativesMap;
 
-		static const std::array<void*, 10> _pluginApi;
+		static const std::array<void*, 13> _pluginApi;
 	};
 
 	extern CppLanguageModule g_golm;

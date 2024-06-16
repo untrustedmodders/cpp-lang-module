@@ -2,6 +2,8 @@
 
 #include <string>
 #include <cstdint>
+#include <filesystem>
+#include <optional>
 
 namespace plugify {
 	constexpr int kApiVersion = 1;
@@ -11,8 +13,13 @@ namespace plugify {
 	using EndFunc = void (*)();
 
 	using GetMethodFn = void* (*)(const std::string&);
+	using IsModuleLoadedFn = bool (*)(const std::string&, std::optional<int32_t>, bool);
+	using IsPluginLoadedFn = bool (*)(const std::string&, std::optional<int32_t>, bool);
+
 	extern GetMethodFn GetMethod;
-	
+	extern IsModuleLoadedFn IsModuleLoaded;
+	extern IsPluginLoadedFn IsPluginLoaded;
+
 	namespace plugin {
 		extern void* handle;
 
@@ -23,6 +30,7 @@ namespace plugify {
 		using GetVersionFn = const std::string& (*)(void*);
 		using GetAuthorFn = const std::string& (*)(void*);
 		using GetWebsiteFn = const std::string& (*)(void*);
+		using GetBaseDirFn = const std::filesystem::path& (*)(void*);
 		using GetDependenciesFn = std::vector<std::string_view> (*)(void*);
 		using FindResourceFn = std::optional<std::filesystem::path> (*)(void*, const std::filesystem::path&);
 
@@ -33,6 +41,7 @@ namespace plugify {
 		extern GetVersionFn GetVersion;
 		extern GetAuthorFn GetAuthor;
 		extern GetWebsiteFn GetWebsite;
+		extern GetBaseDirFn GetBaseDir;
 		extern GetDependenciesFn GetDependencies;
 		extern FindResourceFn FindResource;
 	}
@@ -50,6 +59,7 @@ namespace plugify {
 		const std::string& GetVersion() const { return plugin::GetVersion(plugin::handle); }
 		const std::string& GetAuthor() const { return plugin::GetAuthor(plugin::handle); }
 		const std::string& GetWebsite() const { return plugin::GetWebsite(plugin::handle); }
+		const std::filesystem::path& GetBaseDir() const { return plugin::GetBaseDir(plugin::handle); }
 		std::vector<std::string_view> GetDependencies() const { return plugin::GetDependencies(plugin::handle); }
 		std::optional<std::filesystem::path> FindResource(const std::filesystem::path& path) const { return plugin::FindResource(plugin::handle, path); }
 
@@ -62,6 +72,8 @@ namespace plugify {
 
 #define EXPOSE_PLUGIN(plugin_api, interface_addr) namespace plugify { \
 	GetMethodFn GetMethod{ nullptr }; \
+	IsModuleLoadedFn IsModuleLoaded{ nullptr }; \
+	IsPluginLoadedFn IsPluginLoaded{ nullptr }; \
 	namespace plugin { \
         void* handle{ nullptr }; \
 		GetIdFn GetId{ nullptr }; \
@@ -71,6 +83,7 @@ namespace plugify {
 		GetVersionFn GetVersion{ nullptr }; \
 		GetAuthorFn GetAuthor{ nullptr }; \
 		GetWebsiteFn GetWebsite{ nullptr }; \
+		GetBaseDirFn GetBaseDir{ nullptr }; \
 		GetDependenciesFn GetDependencies{ nullptr }; \
 		FindResourceFn FindResource{ nullptr }; \
 	} \
@@ -79,16 +92,20 @@ namespace plugify {
 		if (version < kApiVersion) { \
 			return kApiVersion; \
 		} \
-		GetMethod = reinterpret_cast<GetMethodFn>(api[0]); \
-		plugin::GetName = reinterpret_cast<GetNameFn>(api[1]); \
-		plugin::GetId = reinterpret_cast<GetNameFn>(api[2]); \
-		plugin::GetFullName = reinterpret_cast<GetFullNameFn>(api[3]); \
-		plugin::GetDescription = reinterpret_cast<GetDescriptionFn>(api[4]); \
-		plugin::GetVersion = reinterpret_cast<GetVersionFn>(api[5]); \
-		plugin::GetAuthor = reinterpret_cast<GetAuthorFn>(api[6]); \
-		plugin::GetWebsite = reinterpret_cast<GetWebsiteFn>(api[7]); \
-		plugin::GetDependencies = reinterpret_cast<GetDependenciesFn>(api[8]); \
-		plugin::FindResource = reinterpret_cast<FindResourceFn>(api[9]); \
+        size_t i = 0; \
+		GetMethod = reinterpret_cast<GetMethodFn>(api[i++]); \
+		IsModuleLoaded = reinterpret_cast<IsModuleLoadedFn>(api[i++]); \
+		IsPluginLoaded = reinterpret_cast<IsPluginLoadedFn>(api[i++]); \
+		plugin::GetId = reinterpret_cast<plugin::GetIdFn>(api[i++]); \
+		plugin::GetName = reinterpret_cast<plugin::GetNameFn>(api[i++]); \
+		plugin::GetFullName = reinterpret_cast<plugin::GetFullNameFn>(api[i++]); \
+		plugin::GetDescription = reinterpret_cast<plugin::GetDescriptionFn>(api[i++]); \
+		plugin::GetVersion = reinterpret_cast<plugin::GetVersionFn>(api[i++]); \
+		plugin::GetAuthor = reinterpret_cast<plugin::GetAuthorFn>(api[i++]); \
+		plugin::GetWebsite = reinterpret_cast<plugin::GetWebsiteFn>(api[i++]); \
+		plugin::GetBaseDir = reinterpret_cast<plugin::GetBaseDirFn>(api[i++]); \
+		plugin::GetDependencies = reinterpret_cast<plugin::GetDependenciesFn>(api[i++]); \
+		plugin::FindResource = reinterpret_cast<plugin::FindResourceFn>(api[i++]); \
 		plugin::handle = handle; \
 		return 0; \
 	} \
