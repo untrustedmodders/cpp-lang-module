@@ -44,7 +44,7 @@ namespace cpplm {
 		std::unordered_map<std::string, AssemblyHolder> _assemblyMap;
 		std::unordered_map<std::string, void*> _nativesMap;
 
-		static const std::array<void*, 13> _pluginApi;
+		static const std::array<void*, 14> _pluginApi;
 	};
 
 	extern CppLanguageModule g_golm;

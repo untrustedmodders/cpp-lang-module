@@ -242,7 +242,7 @@ def main(manifest_path, output_dir, override):
         content += (f'\t\tusing {method["name"]}Fn = {return_type} '
                     f'(*)({gen_params_string(method["paramTypes"], ParamGen.Types)});\n')
         content += (f'\t\tstatic auto func = '
-                    f'reinterpret_cast<{method["name"]}Fn>(plugify::GetMethod("{plugin_name}.{method["name"]}"));\n')
+                    f'reinterpret_cast<{method["name"]}Fn>(plugify::GetMethodPtr("{plugin_name}.{method["name"]}"));\n')
         content += (f'\t\t{"return " if ret_type["type"] != "void" else ""}'
                     f'func({gen_params_string(method["paramTypes"], ParamGen.Names)});\n')
         content += '\t}\n'

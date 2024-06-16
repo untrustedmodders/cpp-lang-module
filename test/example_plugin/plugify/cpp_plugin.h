@@ -12,11 +12,13 @@ namespace plugify {
 	using StartFunc = void (*)();
 	using EndFunc = void (*)();
 
-	using GetMethodFn = void* (*)(const std::string&);
+	using GetMethodPtrFn = void* (*)(const std::string&);
+	using GetBaseDirFn = const std::filesystem::path& (*)();
 	using IsModuleLoadedFn = bool (*)(const std::string&, std::optional<int32_t>, bool);
 	using IsPluginLoadedFn = bool (*)(const std::string&, std::optional<int32_t>, bool);
 
-	extern GetMethodFn GetMethod;
+	extern GetMethodPtrFn GetMethodPtr;
+	extern GetBaseDirFn GetBaseDir;
 	extern IsModuleLoadedFn IsModuleLoaded;
 	extern IsPluginLoadedFn IsPluginLoaded;
 
@@ -45,7 +47,7 @@ namespace plugify {
 		extern GetDependenciesFn GetDependencies;
 		extern FindResourceFn FindResource;
 	}
-	
+
 	class IPluginEntry {
 	protected:
 		IPluginEntry() = default;
@@ -71,7 +73,8 @@ namespace plugify {
 }
 
 #define EXPOSE_PLUGIN(plugin_api, interface_addr) namespace plugify { \
-	GetMethodFn GetMethod{ nullptr }; \
+	GetMethodPtrFn GetMethodPtr{ nullptr }; \
+	GetBaseDirFn GetBaseDir{ nullptr }; \
 	IsModuleLoadedFn IsModuleLoaded{ nullptr }; \
 	IsPluginLoadedFn IsPluginLoaded{ nullptr }; \
 	namespace plugin { \
@@ -93,7 +96,8 @@ namespace plugify {
 			return kApiVersion; \
 		} \
         size_t i = 0; \
-		GetMethod = reinterpret_cast<GetMethodFn>(api[i++]); \
+		GetMethodPtr = reinterpret_cast<GetMethodPtrFn>(api[i++]); \
+		GetBaseDir = reinterpret_cast<GetBaseDirFn>(api[i++]); \
 		IsModuleLoaded = reinterpret_cast<IsModuleLoadedFn>(api[i++]); \
 		IsPluginLoaded = reinterpret_cast<IsPluginLoadedFn>(api[i++]); \
 		plugin::GetId = reinterpret_cast<plugin::GetIdFn>(api[i++]); \

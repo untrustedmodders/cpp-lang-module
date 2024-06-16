@@ -129,6 +129,10 @@ void* GetMethodPtr(const std::string& methodName) {
 	return g_cpplm.GetNativeMethod(methodName);
 }
 
+const fs::path& GetBaseDir() {
+	return g_cpplm.GetProvider()->GetBaseDir();
+}
+
 bool IsModuleLoaded(const std::string& moduleName, std::optional<int32_t> requiredVersion, bool minimum) {
 	return g_cpplm.GetProvider()->IsModuleLoaded(moduleName, requiredVersion, minimum);
 }
@@ -183,8 +187,9 @@ std::optional<fs::path> FindPluginResource(const plugify::IPlugin& plugin, const
 	return plugin.FindResource(path);
 }
 
-const std::array<void*, 13> CppLanguageModule::_pluginApi = {
+const std::array<void*, 14> CppLanguageModule::_pluginApi = {
 		reinterpret_cast<void*>(&::GetMethodPtr),
+		reinterpret_cast<void*>(&::GetBaseDir),
 		reinterpret_cast<void*>(&::IsModuleLoaded),
 		reinterpret_cast<void*>(&::IsPluginLoaded),
 		reinterpret_cast<void*>(&::GetPluginId),
