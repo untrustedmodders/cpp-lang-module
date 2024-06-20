@@ -79,7 +79,7 @@ namespace plugify {
 	IsModuleLoadedFn IsModuleLoaded{ nullptr }; \
 	IsPluginLoadedFn IsPluginLoaded{ nullptr }; \
 	namespace plugin { \
-        void* handle{ nullptr }; \
+		void* handle{ nullptr }; \
 		GetIdFn GetId{ nullptr }; \
 		GetNameFn GetName{ nullptr }; \
 		GetFullNameFn GetFullName{ nullptr }; \
@@ -96,7 +96,7 @@ namespace plugify {
 		if (version < kApiVersion) { \
 			return kApiVersion; \
 		} \
-        size_t i = 0; \
+		size_t i = 0; \
 		GetMethodPtr = reinterpret_cast<GetMethodPtrFn>(api[i++]); \
 		GetBaseDir = reinterpret_cast<GetBaseDirFn>(api[i++]); \
 		IsModuleLoaded = reinterpret_cast<IsModuleLoadedFn>(api[i++]); \
@@ -131,12 +131,16 @@ namespace plugify {
 	struct Vector2 {
 		float x{};
 		float y{};
+
+		bool operator==(const Vector2&) const = default;
 	};
 
 	struct Vector3 {
 		float x{};
 		float y{};
 		float z{};
+
+		bool operator==(const Vector3&) const = default;
 	};
 
 	struct Vector4 {
@@ -144,9 +148,28 @@ namespace plugify {
 		float y{};
 		float z{};
 		float w{};
+
+		bool operator==(const Vector4&) const = default;
 	};
 
 	struct Matrix4x4 {
-		float m[4][4]{};
+		float m00{}, m10{}, m20{}, m30{};
+		float m01{}, m11{}, m21{}, m31{};
+		float m02{}, m12{}, m22{}, m32{};
+		float m03{}, m13{}, m23{}, m33{};
+		
+		Matrix4x4(
+				float m00, float m01, float m02, float m03,
+				float m10, float m11, float m12, float m13,
+				float m20, float m21, float m22, float m23,
+				float m30, float m31, float m32, float m33)
+		{
+			this->m00 = m00; this->m01 = m01; this->m02 = m02; this->m03 = m03;
+			this->m10 = m10; this->m11 = m11; this->m12 = m12; this->m13 = m13;
+			this->m20 = m20; this->m21 = m21; this->m22 = m22; this->m23 = m23;
+			this->m30 = m30; this->m31 = m31; this->m32 = m32; this->m33 = m33;
+		}
+
+		bool operator==(const Matrix4x4&) const = default;
 	};
 }
