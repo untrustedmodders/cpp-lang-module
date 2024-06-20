@@ -1,0 +1,24 @@
+{
+	"fileVersion": 1,
+	"version": 1,
+	"versionName": "1.0",
+	"friendlyName": "Cross-call Master",
+	"description": "Tests calls to and from another language plugin",
+	"createdBy": "untrustedmodders",
+	"createdByURL": "https://github.com/untrustedmodders/",
+	"docsURL": "",
+	"downloadURL": "",
+	"updateURL": "",
+	"entryPoint": "cross_call_master",
+	"supportedPlatforms": [],
+	"languageModule": {
+		"name": "cpp"
+	},
+	"dependencies": [
+		{
+			"name": "cross_call_worker"
+		}
+	],
+	"exportedMethods": [
+	]
+}
