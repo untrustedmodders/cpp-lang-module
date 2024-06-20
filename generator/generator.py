@@ -143,11 +143,11 @@ def validate_manifest(pplugin):
 
 def convert_type(type_name, is_ref: False, is_ret: False):
     if is_ret:
-        return RET_TYPES_MAP.get(type_name, 'int')
+        return RET_TYPES_MAP[type_name]
     elif is_ref:
-        return REF_TYPES_MAP.get(type_name, 'int')
+        return REF_TYPES_MAP[type_name]
     else:
-        return VAL_TYPES_MAP.get(type_name, 'int')
+        return VAL_TYPES_MAP[type_name]
 
 
 class ParamGen(Enum):
@@ -200,7 +200,7 @@ def main(manifest_path, output_dir, override):
         os.makedirs(header_dir, exist_ok=True)
     header_file = os.path.join(header_dir, f'{plugin_name}.h')
     if os.path.isfile(header_file) and not override:
-        print(f'Already exists {header_file}')
+        print(f'Already exists {header_file}. Can use --override option')
         return 1
 
     with open(manifest_path, 'r', encoding='utf-8') as fd:
@@ -214,8 +214,6 @@ def main(manifest_path, output_dir, override):
         return 1
 
     content = ''
-
-    # TODO: Make POD structures pass as fist argument for return types
     
     link = 'https://github.com/untrustedmodders/cpp-lang-module/blob/main/generator/generator.py'
 
@@ -226,7 +224,7 @@ def main(manifest_path, output_dir, override):
     content += '#include <string>\n'
     content += '#include <cstdint>\n'
     content += '\n'
-    content += f'//generated with {link} from {plugin_name} \n'
+    content += f'// Generated from {plugin_name}.pplugin by {link} \n'
     content += '\n'
     content += f'namespace {plugin_name} {{\n'
     for method in pplugin['exportedMethods']:
@@ -261,7 +259,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('manifest')
     parser.add_argument('output')
-    parser.add_argument('--override')
+    parser.add_argument('--override', action='store_true')
     return parser.parse_args()
 
 
