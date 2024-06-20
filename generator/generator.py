@@ -223,6 +223,8 @@ def main(manifest_path, output_dir, override):
     content += '\n'
     content += '#include <plugify/cpp_plugin.h>\n'
     content += '#include <vector>\n'
+    content += '#include <string>\n'
+    content += '#include <cstdint>\n'
     content += '\n'
     content += f'//generated with {link} from {plugin_name} \n'
     content += '\n'
@@ -232,6 +234,7 @@ def main(manifest_path, output_dir, override):
         return_type = convert_type(ret_type["type"], "ref" in ret_type, True)
 
         if "prototype" in ret_type:
+            return_type = ret_type['prototype']['name']
             content += gen_delegate(ret_type['prototype'])
         for attribute in method['paramTypes']:
             if "prototype" in attribute:
@@ -241,10 +244,10 @@ def main(manifest_path, output_dir, override):
                     f'{method["name"]}({gen_params_string(method["paramTypes"], ParamGen.TypesNames)}) {{\n')
         content += (f'\t\tusing {method["name"]}Fn = {return_type} '
                     f'(*)({gen_params_string(method["paramTypes"], ParamGen.Types)});\n')
-        content += (f'\t\tstatic auto func = '
+        content += (f'\t\tstatic auto __func = '
                     f'reinterpret_cast<{method["name"]}Fn>(plugify::GetMethodPtr("{plugin_name}.{method["name"]}"));\n')
         content += (f'\t\t{"return " if ret_type["type"] != "void" else ""}'
-                    f'func({gen_params_string(method["paramTypes"], ParamGen.Names)});\n')
+                    f'__func({gen_params_string(method["paramTypes"], ParamGen.Names)});\n')
         content += '\t}\n'
     content += '}\n'
 
