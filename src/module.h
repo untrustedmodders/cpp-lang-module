@@ -13,7 +13,7 @@
 namespace cpplm {
 	class AssemblyHolder {
 	public:
-		AssemblyHolder(std::unique_ptr<Assembly> assembly, plugify::StartFunc startFunc, plugify::EndFunc endFunc) : _assembly{ std::move(assembly) }, _startFunc{ startFunc }, _endFunc{ endFunc } {}
+		AssemblyHolder(std::unique_ptr<Assembly> assembly, plugify::StartFunc startFunc, plugify::EndFunc endFunc) : _assembly{std::move(assembly)}, _startFunc{startFunc}, _endFunc{endFunc} {}
 
 		plugify::StartFunc GetStartFunc() const { return _startFunc; }
 		plugify::EndFunc GetEndFunc() const { return _endFunc; }
