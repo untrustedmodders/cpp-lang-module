@@ -51,7 +51,7 @@ namespace cpplm {
 		return lastError;
 	}
 
-	Assembly::Assembly(void* handle) : _handle{handle} {
+	Assembly::Assembly(void* handle) : _handle(handle) {
 	}
 
 	Assembly::~Assembly() {

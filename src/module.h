@@ -47,7 +47,7 @@ namespace cpplm {
 		static const std::array<void*, 14> _pluginApi;
 	};
 
-	extern CppLanguageModule g_golm;
+	extern CppLanguageModule g_cpplm;
 }
 
 extern "C" CPPLM_EXPORT plugify::ILanguageModule* GetLanguageModule();

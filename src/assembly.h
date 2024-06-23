@@ -14,9 +14,9 @@ namespace cpplm {
 		~Assembly();
 
 		void* GetFunction(const char* functionName) const;
-		template<class _Fn> requires(std::is_pointer_v<_Fn> && std::is_function_v<std::remove_pointer_t<_Fn>>)
-		_Fn GetFunction(const char* functionName) const {
-			return reinterpret_cast<_Fn>(GetFunction(functionName));
+		template<class F> requires(std::is_pointer_v<F> && std::is_function_v<std::remove_pointer_t<F>>)
+		F GetFunction(const char* functionName) const {
+			return reinterpret_cast<F>(GetFunction(functionName));
 		}
 
 	private:
