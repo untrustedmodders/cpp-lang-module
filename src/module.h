@@ -8,6 +8,7 @@
 #include <plugify/log.h>
 #include <module_export.h>
 #include <unordered_map>
+#include <map>
 #include <array>
 
 namespace cpplm {
@@ -41,7 +42,7 @@ namespace cpplm {
 
 	private:
 		std::shared_ptr<plugify::IPlugifyProvider> _provider;
-		std::unordered_map<std::string, AssemblyHolder> _assemblyMap;
+		std::map<plugify::UniqueId, AssemblyHolder> _assemblyMap;
 		std::unordered_map<std::string, void*> _nativesMap;
 
 		static const std::array<void*, 14> _pluginApi;
