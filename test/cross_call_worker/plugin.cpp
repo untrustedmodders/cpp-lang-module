@@ -231,17 +231,17 @@ PLUGIN_API void Param7(int32_t a, float b, double c, const plugify::Vector4& d, 
 
 extern "C"
 PLUGIN_API void Param8(int32_t a, float b, double c, const plugify::Vector4& d, const std::vector<int64_t>& e, char f, const std::string& g, char16_t h) {
-	const auto buffer = std::format("{}{:.2f}{:.2f}{:.1f}{:.1f}{}{}{}{}{}", a, b, c, d.x, d.w, e.size(), e.size() == 3 ? e[2] : int64_t{0}, static_cast<uint8_t>(f), g, static_cast<uint8_t>(h));
+	const auto buffer = std::format("{}{:.2f}{:.2f}{:.1f}{:.1f}{}{}{}{}{}", a, b, c, d.x, d.w, e.size(), e.size() == 3 ? e[2] : int64_t{0}, static_cast<uint8_t>(f), g, static_cast<uint16_t>(h));
 }
 
 extern "C"
 PLUGIN_API void Param9(int32_t a, float b, double c, const plugify::Vector4& d, const std::vector<int64_t>& e, char f, const std::string& g, char16_t h, int16_t k) {
-	const auto buffer = std::format("{}{:.2f}{:.2f}{:.1f}{:.1f}{}{}{}{}{}{}", a, b, c, d.x, d.w, e.size(), e.size() == 3 ? e[2] : int64_t{0}, static_cast<uint8_t>(f), g, static_cast<uint8_t>(h), k);
+	const auto buffer = std::format("{}{:.2f}{:.2f}{:.1f}{:.1f}{}{}{}{}{}{}", a, b, c, d.x, d.w, e.size(), e.size() == 3 ? e[2] : int64_t{0}, static_cast<uint8_t>(f), g, static_cast<uint16_t>(h), k);
 }
 
 extern "C"
 PLUGIN_API void Param10(int32_t a, float b, double c, const plugify::Vector4& d, const std::vector<int64_t>& e, char f, const std::string& g, char16_t h, int16_t k, void* l) {
-	const auto buffer = std::format("{}{:.2f}{:.2f}{:.1f}{:.1f}{}{}{}{}{}{}{}", a, b, c, d.x, d.w, e.size(), e.size() == 3 ? e[2] : int64_t{0}, static_cast<uint8_t>(f), g, static_cast<uint8_t>(h), k, l);
+	const auto buffer = std::format("{}{:.2f}{:.2f}{:.1f}{:.1f}{}{}{}{}{}{}{}", a, b, c, d.x, d.w, e.size(), e.size() == 3 ? e[2] : int64_t{0}, static_cast<uint8_t>(f), g, static_cast<uint16_t>(h), k, l);
 }
 
 extern "C"
@@ -293,7 +293,7 @@ extern "C"
 PLUGIN_API void ParamRef7(int32_t& a, float& b, double& c, plugify::Vector4& d, std::vector<int64_t>& e, char& f, std::string& g) {
 	a = -1000;
 	b = 3.0f;
-	c = -1;
+	c = -1.0;
 	d = {100.0f, 200.0f, 300.0f, 400.0f};
 	e = {-6, -5, -4, -3};
 	f = 'Y';

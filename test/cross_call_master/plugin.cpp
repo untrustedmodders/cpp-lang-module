@@ -44,7 +44,7 @@ class CrossCallMaster : public plugify::IPluginEntry {
 
 	void NoParamOnlyReturn() {
 #if TEST_CASES & TEST_NO_PARAM_ONLY_RETURN_PRIMITIVES
-		_tests.Add("NoParamReturnVoid", [](SimpleTests::Test& test) {
+		_tests.Add("NoParamReturnVoid", [](SimpleTests::Test& /*test*/) {
 			cross_call_worker::NoParamReturnVoid();
 		});
 		_tests.Add("NoParamReturnBool", [](SimpleTests::Test& test) {
@@ -159,7 +159,7 @@ class CrossCallMaster : public plugify::IPluginEntry {
 			auto expected = "Hello World";
 			auto result = cross_call_worker::NoParamReturnString();
 			if (result != expected) {
-				test.Fail(std::format("Wrong return {}, expected {}", result, expected));
+				test.Fail(std::format("Wrong return '{}', expected '{}'", result, expected));
 			}
 		});
 #endif // TEST_CASES & TEST_NO_PARAM_ONLY_RETURN_OBJECTS
@@ -464,7 +464,7 @@ class CrossCallMaster : public plugify::IPluginEntry {
 			auto expected = plugify::Matrix4x4({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
 			auto result = cross_call_worker::NoParamReturnMatrix4x4();
 			if (result != expected) {
-				test.Fail(std::format("Wrong return {{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}}}, "
+				test.Fail(std::format("Wrong return {{{{{}, {}, {}, {}}}, {{{}, {}, {}, {}}}, {{{}, {}, {}, {}}}, {{{}, {}, {}, {}}}}}, "
 					"expected {{{{{}, {}, {}, {}}}, {{{}, {}, {}, {}}}, {{{}, {}, {}, {}}}, {{{}, {}, {}, {}}}}}",
 					result.m[0][0], result.m[0][1], result.m[0][2], result.m[0][3],
 					result.m[1][0], result.m[1][1], result.m[1][2], result.m[1][3],
@@ -489,50 +489,50 @@ class CrossCallMaster : public plugify::IPluginEntry {
 		constexpr const int16_t shortValue = 10;
 		constexpr void* const ptrValue = nullptr;
 		
-		_tests.Add("Param1", [](SimpleTests::Test& test) {
+		_tests.Add("Param1", [](SimpleTests::Test& /*test*/) {
 			cross_call_worker::Param1(intValue);
 		});
 
-		_tests.Add("Param2", [](SimpleTests::Test& test) {
+		_tests.Add("Param2", [](SimpleTests::Test& /*test*/) {
 			cross_call_worker::Param2(intValue, floatValue);
 		});
 
-		_tests.Add("Param3", [](SimpleTests::Test& test) {
+		_tests.Add("Param3", [](SimpleTests::Test& /*test*/) {
 			cross_call_worker::Param3(intValue, floatValue, doubleValue);
 		});
 
-		_tests.Add("Param4", [](SimpleTests::Test& test) {
+		_tests.Add("Param4", [](SimpleTests::Test& /*test*/) {
 			const plugify::Vector4 vector4Value(1.0f, 2.0f, 3.0f, 4.0f);
 			cross_call_worker::Param4(intValue, floatValue, doubleValue, vector4Value);
 		});
 
-		_tests.Add("Param5", [](SimpleTests::Test& test) {
+		_tests.Add("Param5", [](SimpleTests::Test& /*test*/) {
 			const plugify::Vector4 vector4Value(1.0f, 2.0f, 3.0f, 4.0f);
 			const std::vector<int64_t> longListValue = {100, 200, 300};
 			cross_call_worker::Param5(intValue, floatValue, doubleValue, vector4Value, longListValue);
 		});
 
-		_tests.Add("Param6", [](SimpleTests::Test& test) {
+		_tests.Add("Param6", [](SimpleTests::Test& /*test*/) {
 			const plugify::Vector4 vector4Value(1.0f, 2.0f, 3.0f, 4.0f);
 			const std::vector<int64_t> longListValue = {100, 200, 300};
 			cross_call_worker::Param6(intValue, floatValue, doubleValue, vector4Value, longListValue, charValue);
 		});
 
-		_tests.Add("Param7", [](SimpleTests::Test& test) {
+		_tests.Add("Param7", [](SimpleTests::Test& /*test*/) {
 			const plugify::Vector4 vector4Value(1.0f, 2.0f, 3.0f, 4.0f);
 			const std::vector<int64_t> longListValue = {100, 200, 300};
 			const std::string stringValue = "Hello";
 			cross_call_worker::Param7(intValue, floatValue, doubleValue, vector4Value, longListValue, charValue, stringValue);
 		});
 
-		_tests.Add("Param9", [](SimpleTests::Test& test) {
+		_tests.Add("Param9", [](SimpleTests::Test& /*test*/) {
 			const plugify::Vector4 vector4Value(1.0f, 2.0f, 3.0f, 4.0f);
 			const std::vector<int64_t> longListValue = {100, 200, 300};
 			const std::string stringValue = "Hello";
 			cross_call_worker::Param9(intValue, floatValue, doubleValue, vector4Value, longListValue, charValue, stringValue, char16Value, shortValue);
 		});
 
-		_tests.Add("Param10", [](SimpleTests::Test& test) {
+		_tests.Add("Param10", [](SimpleTests::Test& /*test*/) {
 			const plugify::Vector4 vector4Value(1.0f, 2.0f, 3.0f, 4.0f);
 			const std::vector<int64_t> longListValue = {100, 200, 300};
 			const std::string stringValue = "Hello";
@@ -691,7 +691,7 @@ class CrossCallMaster : public plugify::IPluginEntry {
 				test.Fail(std::format("Wrong longListValue param {{{}}}, expected {{{}}}", modified_formated, expected_formated));
 			}
 			if (charValue != charExpected) {
-				test.Fail(std::format("Wrong charValue param {}, expected {}", charValue, charExpected));
+				test.Fail(std::format("Wrong charValue param {}, expected {}", static_cast<uint8_t>(charValue), static_cast<uint8_t>(charExpected)));
 			}
 		});
 		_tests.Add("ParamRef7", [](SimpleTests::Test& test) {
@@ -739,10 +739,10 @@ class CrossCallMaster : public plugify::IPluginEntry {
 				test.Fail(std::format("Wrong longListValue param {{{}}}, expected {{{}}}", modified_formated, expected_formated));
 			}
 			if (charValue != charExpected) {
-				test.Fail(std::format("Wrong charValue param {}, expected {}", charValue, charExpected));
+				test.Fail(std::format("Wrong charValue param {}, expected {}", static_cast<uint8_t>(charValue), static_cast<uint8_t>(charExpected)));
 			}
 			if (stringValue != stringExpected) {
-				test.Fail(std::format("Wrong stringValue param {}, expected {}", stringValue, stringExpected));
+				test.Fail(std::format("Wrong stringValue param '{}', expected '{}'", stringValue, stringExpected));
 			}
 		});
 		_tests.Add("ParamRef8", [](SimpleTests::Test& test) {
@@ -792,10 +792,10 @@ class CrossCallMaster : public plugify::IPluginEntry {
 				test.Fail(std::format("Wrong longListValue param {{{}}}, expected {{{}}}", modified_formated, expected_formated));
 			}
 			if (charValue != charExpected) {
-				test.Fail(std::format("Wrong charValue param {}, expected {}", charValue, charExpected));
+				test.Fail(std::format("Wrong charValue param {}, expected {}", static_cast<uint8_t>(charValue), static_cast<uint8_t>(charExpected)));
 			}
 			if (stringValue != stringExpected) {
-				test.Fail(std::format("Wrong stringValue param {}, expected {}", stringValue, stringExpected));
+				test.Fail(std::format("Wrong stringValue param '{}', expected '{}'", stringValue, stringExpected));
 			}
 			if (char16Value != char16Expected) {
 				test.Fail(std::format("Wrong char16Value param {}, expected {}", static_cast<uint16_t>(char16Value), static_cast<uint16_t>(char16Expected)));
@@ -850,10 +850,10 @@ class CrossCallMaster : public plugify::IPluginEntry {
 				test.Fail(std::format("Wrong longListValue param {{{}}}, expected {{{}}}", modified_formated, expected_formated));
 			}
 			if (charValue != charExpected) {
-				test.Fail(std::format("Wrong charValue param {}, expected {}", charValue, charExpected));
+				test.Fail(std::format("Wrong charValue param {}, expected {}", static_cast<uint8_t>(charValue), static_cast<uint8_t>(charExpected)));
 			}
 			if (stringValue != stringExpected) {
-				test.Fail(std::format("Wrong stringValue param {}, expected {}", stringValue, stringExpected));
+				test.Fail(std::format("Wrong stringValue param '{}', expected '{}'", stringValue, stringExpected));
 			}
 			if (char16Value != char16Expected) {
 				test.Fail(std::format("Wrong char16Value param {}, expected {}", static_cast<uint16_t>(char16Value), static_cast<uint16_t>(char16Expected)));
@@ -913,10 +913,10 @@ class CrossCallMaster : public plugify::IPluginEntry {
 				test.Fail(std::format("Wrong longListValue param {{{}}}, expected {{{}}}", modified_formated, expected_formated));
 			}
 			if (charValue != charExpected) {
-				test.Fail(std::format("Wrong charValue param {}, expected {}", charValue, charExpected));
+				test.Fail(std::format("Wrong charValue param {}, expected {}", static_cast<uint8_t>(charValue), static_cast<uint8_t>(charExpected)));
 			}
 			if (stringValue != stringExpected) {
-				test.Fail(std::format("Wrong stringValue param {}, expected {}", stringValue, stringExpected));
+				test.Fail(std::format("Wrong stringValue param '{}', expected '{}'", stringValue, stringExpected));
 			}
 			if (char16Value != char16Expected) {
 				test.Fail(std::format("Wrong char16Value param {}, expected {}", static_cast<uint16_t>(char16Value), static_cast<uint16_t>(char16Expected)));
@@ -1165,14 +1165,14 @@ class CrossCallMaster : public plugify::IPluginEntry {
 			if (stringArray != stringArrayExpected) {
 				std::string modified_formated;
 				if (!stringArray.empty()) {
-					modified_formated = std::format("{}", stringArray[0]);
+					modified_formated = std::format("'{}'", stringArray[0]);
 					for (auto it = std::next(stringArray.begin()); it != stringArray.end(); ++it) {
-						std::format_to(std::back_inserter(modified_formated), ", {}", *it);
+						std::format_to(std::back_inserter(modified_formated), ", '{}'", *it);
 					}
 				}
-				std::string expected_formated = std::format("{}", stringArrayExpected[0]);
+				std::string expected_formated = std::format("'{}'", stringArrayExpected[0]);
 				for (auto it = std::next(stringArrayExpected.begin()); it != stringArrayExpected.end(); ++it) {
-					std::format_to(std::back_inserter(expected_formated), ", {}", *it);
+					std::format_to(std::back_inserter(expected_formated), ", '{}'", *it);
 				}
 				test.Fail(std::format("Wrong stringArray array {{{}}}, expected {{{}}}", modified_formated, expected_formated));
 			}
