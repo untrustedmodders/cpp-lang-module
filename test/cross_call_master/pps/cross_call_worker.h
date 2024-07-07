@@ -299,4 +299,9 @@ namespace cross_call_worker {
 		static auto __func = reinterpret_cast<ParamAllPrimitivesFn>(plugify::GetMethodPtr("cross_call_worker.ParamAllPrimitives"));
 		return __func(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
 	}
+	inline void ReverseCall(const std::string& test) {
+		using ReverseCallFn = void (*)(const std::string&);
+		static auto __func = reinterpret_cast<ReverseCallFn>(plugify::GetMethodPtr("cross_call_worker.ReverseCall"));
+		__func(test);
+	}
 }

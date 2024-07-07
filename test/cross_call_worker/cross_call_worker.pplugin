@@ -1203,6 +1203,20 @@
 			"retType": {
 				"type": "int64"
 			}
+		},
+		{
+			"name": "ReverseCall",
+			"funcName": "ReverseCall",
+			"paramTypes": [
+				{
+					"name": "test",
+					"type": "string",
+					"ref": false
+				}
+			],
+			"retType": {
+				"type": "void"
+			}
 		}
 	]
 }

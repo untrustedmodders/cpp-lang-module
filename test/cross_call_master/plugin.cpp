@@ -1,4 +1,4 @@
-#include <pps/cross_call_worker.h>
+﻿#include <pps/cross_call_worker.h>
 #include <plugify/cpp_plugin.h>
 #include <plugin_export.h>
 #include "simple_tests.h"
@@ -1208,48 +1208,1043 @@ class CrossCallMaster : public plugify::IPluginEntry {
 	}
 
 	void ReverseNoParamOnlyReturn() {
-		//cross_call_worker::ReverseCalls();
-
 #if TEST_CASES & TEST_REVERSE_NO_PARAM_ONLY_RETURN_PRIMITIVES
-		
+		_tests.Add("ReverseNoParamReturnVoid", [](SimpleTests::Test& /*test*/) {
+			cross_call_worker::ReverseCall("NoParamReturnVoid");
+		});
+		_tests.Add("ReverseNoParamReturnBool", [this](SimpleTests::Test& test) {
+			const std::string expected = "true";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnBool");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnChar8", [this](SimpleTests::Test& test) {
+			const std::string expected = "80"; // P
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnChar8");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnChar16", [this](SimpleTests::Test& test) {
+			const std::string expected = "1060"; // Ф
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnChar16");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnInt8", [this](SimpleTests::Test& test) {
+			const std::string expected = "123";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnInt8");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnInt16", [this](SimpleTests::Test& test) {
+			const std::string expected = "32765";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnInt16");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnInt32", [this](SimpleTests::Test& test) {
+			const std::string expected = "2112211221";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnInt32");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnInt64", [this](SimpleTests::Test& test) {
+			const std::string expected = "8526495038839145831";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnInt64");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnUInt8", [this](SimpleTests::Test& test) {
+			const std::string expected = "205";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnUInt8");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnUInt16", [this](SimpleTests::Test& test) {
+			const std::string expected = "52685";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnUInt16");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnUInt32", [this](SimpleTests::Test& test) {
+			const std::string expected = "3452816845";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnUInt32");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnUInt64", [this](SimpleTests::Test& test) {
+			const std::string expected = "14829735431805717965";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnUInt64");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnPointer", [this](SimpleTests::Test& test) {
+			const std::string expected = "0xaabbccdd87655678";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnPointer");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnFloat", [this](SimpleTests::Test& test) {
+			const std::string expected = "0.123";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnFloat");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnDouble", [this](SimpleTests::Test& test) {
+			const std::string expected = "987.321";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnDouble");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
 #endif// TEST_CASES & TEST_REVERSE_NO_PARAM_ONLY_RETURN_PRIMITIVES
 
 #if TEST_CASES & TEST_REVERSE_NO_PARAM_ONLY_RETURN_OBJECTS
-
+		_tests.Add("ReverseNoParamReturnFunction", [this](SimpleTests::Test& test) {
+			const std::string expected = "365";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnFunction");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnString", [this](SimpleTests::Test& test) {
+			const std::string expected = "Convertiplane";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnString");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return '{}', expected '{}'", *_reverseReturn, expected));
+			}
+		});
 #endif// TEST_CASES & TEST_REVERSE_NO_PARAM_ONLY_RETURN_OBJECTS
 
 #if TEST_CASES & TEST_REVERSE_NO_PARAM_ONLY_RETURN_ARRAYS
+		_tests.Add("ReverseNoParamReturnArrayBool", [this](SimpleTests::Test& test) {
+			const std::string expected = "{false, true, true}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayBool");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayChar8", [this](SimpleTests::Test& test) {
+			const std::string expected = "{112, 108, 117, 103}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayChar8");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
 
+		});
+		_tests.Add("ReverseNoParamReturnArrayChar16", [this](SimpleTests::Test& test) {
+			const std::string expected = "{1095, 1072, 1088, 33}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayChar16");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayInt8", [this](SimpleTests::Test& test) {
+			const std::string expected = "{10, -15, 20}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayInt8");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayInt16", [this](SimpleTests::Test& test) {
+			const std::string expected = "{10, -15, 20, -25}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayInt16");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayInt32", [this](SimpleTests::Test& test) {
+			const std::string expected = "{10, -15, 20, -25, 30}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayInt32");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayInt64", [this](SimpleTests::Test& test) {
+			const std::string expected = "{10, -15, 20, -25, 30, -35}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayInt64");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayUInt8", [this](SimpleTests::Test& test) {
+			const std::string expected = "{1, 2, 3, 200}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayUInt8");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayUInt16", [this](SimpleTests::Test& test) {
+			const std::string expected = "{1, 2, 3, 200, 60000}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayUInt16");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayUInt32", [this](SimpleTests::Test& test) {
+			const std::string expected = "{1, 2, 3, 200, 60000, 4000000000}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayUInt32");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayUInt64", [this](SimpleTests::Test& test) {
+			const std::string expected = "{1, 2, 3, 200, 60000, 4000000000, 12223334445556667778}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayUInt64");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayPointer", [this](SimpleTests::Test& test) {
+			const std::string expected = "{0x0, 0xdeadbeaf, 0xcdccddcccdddcccc}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayPointer");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayFloat", [this](SimpleTests::Test& test) {
+			const std::string expected = "{1.1, -10.82, 555.555}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayFloat");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayDouble", [this](SimpleTests::Test& test) {
+			const std::string expected = "{1.1, -10.82, 555.555, 55555.55555, 123456789.98765}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayDouble");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnArrayString", [this](SimpleTests::Test& test) {
+			const std::string expected = "{'5', 'true', '0.0', 'Hello', 'And Goodbay', 'Another long string to test. Pi equal 3,1415926535 8979323846 2643383279 5028841971 6939937510'}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnArrayString");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
 #endif// TEST_CASES & TEST_REVERSE_NO_PARAM_ONLY_RETURN_ARRAYS
 
 #if TEST_CASES & TEST_REVERSE_NO_PARAM_ONLY_RETURN_VECTORS
-
+		_tests.Add("ReverseNoParamReturnVector2", [this](SimpleTests::Test& test) {
+			const std::string expected = "{100.9, 200.8}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnVector2");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnVector3", [this](SimpleTests::Test& test) {
+			const std::string expected = "{100.9, 200.8, 300.7}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnVector3");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnVector4", [this](SimpleTests::Test& test) {
+			const std::string expected = "{100.9, 200.8, 300.7, 400.6}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnVector4");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseNoParamReturnMatrix4x4", [this](SimpleTests::Test& test) {
+			const std::string expected = "{{1.1, 2.2, 3.3, 4.4}, {9.9, 1.1, 2.2, 3.3}, {8.8, 9.9, 1.1, 2.2}, {7.7, 8.8, 9.9, 1.1}}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("NoParamReturnMatrix4x4");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
 #endif// TEST_CASES & TEST_REVERSE_NO_PARAM_ONLY_RETURN_VECTORS
 	}
 
 	void ReverseParamsNoRefs() {
 #if TEST_CASES & TEST_REVERSE_PARAMS_NO_REFS
+		_tests.Add("ReverseParam1", [this](SimpleTests::Test& test) {
+			const std::string expected = "999";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param1");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
+		_tests.Add("ReverseParam2", [this](SimpleTests::Test& test) {
+			const std::string expected = "888|9.9";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param2");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
+		_tests.Add("ReverseParam3", [this](SimpleTests::Test& test) {
+			const std::string expected = "777|8.8|9.8765";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param3");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
+		_tests.Add("ReverseParam4", [this](SimpleTests::Test& test) {
+			const std::string expected = "666|7.7|8.7659|{100.1, 200.2, 300.3, 400.4}";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param4");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
+		_tests.Add("ReverseParam5", [this](SimpleTests::Test& test) {
+			const std::string expected = "555|6.6|7.6598|{-105.1, -205.2, -305.3, -405.4}|{}";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param5");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
+		_tests.Add("ReverseParam6", [this](SimpleTests::Test& test) {
+			const std::string expected = "444|5.5|6.5987|{110.1, 210.2, 310.3, 410.4}|{90000, -100, 20000}|65";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param6");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
+		_tests.Add("ReverseParam7", [this](SimpleTests::Test& test) {
+			const std::string expected = "333|4.4|5.9876|{-115.1, -215.2, -315.3, -415.4}|{800000, 30000, -4000000}|66|red gold";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param7");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
+		_tests.Add("ReverseParam8", [this](SimpleTests::Test& test) {
+			const std::string expected = "222|3.3|1.2345|{120.1, 220.2, 320.3, 420.4}|{7000000, 5000000, -600000000}|67|blue ice|90";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param8");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
+		_tests.Add("ReverseParam9", [this](SimpleTests::Test& test) {
+			const std::string expected = "111|2.2|5.1234|{-125.1, -225.2, -325.3, -425.4}|{60000000, -700000000, 80000000000}|68|pink metal|89|-100";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param9");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
+		_tests.Add("ReverseParam10", [this](SimpleTests::Test& test) {
+			const std::string expected = "1234|1.1|4.5123|{130.1, 230.2, 330.3, 430.4}|{500000000, 90000000000, 1000000000000}|69|green wood|88|-200|0xabeba";
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("Param10");
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != expected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, expected));
+			}
+		});
 #endif// TEST_CASES & TEST_REVERSE_PARAMS_NO_REFS
 	}
 
 	void ReverseParamsWithRefs() {
 #if TEST_CASES & TEST_REVERSE_PARAMS_WITH_REFS
+		_tests.Add("ReverseParamRef1", [this](SimpleTests::Test& test) {
+			const std::string expected = "147";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef1");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseParamRef2", [this](SimpleTests::Test& test) {
+			const std::string expected = "852|0.1";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef2");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseParamRef3", [this](SimpleTests::Test& test) {
+			const std::string expected = "369|0.2|11111.11111";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef3");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseParamRef4", [this](SimpleTests::Test& test) {
+			const std::string expected = "987|0.3|22222.22222|{4.4, 3.3, 2.2, 1.1}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef4");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseParamRef5", [this](SimpleTests::Test& test) {
+			const std::string expected = "456|0.4|33333.33333|{1.4, 4.3, 3.2, 2.1}|{}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef5");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseParamRef6", [this](SimpleTests::Test& test) {
+			const std::string expected = "321|0.5|44444.44444|{1.1, 4.4, 3.3, 2.2}|{99}|122";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef6");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseParamRef7", [this](SimpleTests::Test& test) {
+			const std::string expected = "157|0.6|55555.55555|{2.1, 1.4, 4.3, 3.2}|{99, 8888}|121|my string";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef7");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseParamRef8", [this](SimpleTests::Test& test) {
+			const std::string expected = "759|0.7|66666.66666|{2.2, 1.1, 4.4, 3.3}|{99, 8888, 777777}|120|his string|1098";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef8");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseParamRef9", [this](SimpleTests::Test& test) {
+			const std::string expected = "953|0.8|77777.77777|{3.2, 2.1, 1.4, 4.3}|{99, 8888, 777777, 66666666}|119|her string|1099|-30003";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef9");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
+		_tests.Add("ReverseParamRef10", [this](SimpleTests::Test& test) {
+			const std::string expected = "351|0.9|88888.88888|{3.3, 2.2, 1.1, 4.4}|{99, 8888, 777777, 66666666, 5555555555}|118|they string|1100|30003|0xabcdef";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRef10");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
 #endif// TEST_CASES & TEST_REVERSE_PARAMS_WITH_REFS
 	}
 
 	void ReverseParamsRefVectors() {
 #if TEST_CASES & TEST_REVERSE_PARAMS_REF_ARRAYS
+		_tests.Add("ReverseParamRefArrays", [this](SimpleTests::Test& test) {
+			const std::string expected = "{true, false}|{94}|{1103, 1094}|{-4, -3, -2, -1}|{-555, -444, -333}|{-66666, -77777}|{-7666555444}|"
+				"{0, 1, 1, 2, 3, 5}|{32999}|{3000000000, 1}|{1, 22, 333, 4444, 55555, 999999999999}|{0xd, 0x9, 0x5, 0x1}|"
+				"{91.23, 12.34, 23.45, 8.08}|{777.777777}|{'one', '1 two', '1 2 three'}";
+			_reverseReturn.reset();
+			cross_call_worker::ReverseCall("ParamRefArrays");
+			if (!_reverseReturn) {
+				test.Fail("Params return not set");
+			} else if (*_reverseReturn != expected) {
+				test.Fail(std::format("Wrong ref params return {}, expected {}", *_reverseReturn, expected));
+			}
+		});
 #endif// TEST_CASES & TEST_REVERSE_PARAMS_REF_ARRAYS
 	}
 
 	void ReverseParamsAllPrimitives() {
 #if TEST_CASES & TEST_REVERSE_PARAMS_ALL_PRIMITIVES
+		_tests.Add("ReverseParamAllPrimitives", [this](SimpleTests::Test& test) {
+			const std::string returnExpected = "65";
+			const std::string paramsExpected = "true|37|9762|-1|-1000|-1000000|-1000000000000|200|50000|3000000000|9999999999|0xfedcbaabcdef|0.001|987654.456789";
+			_reverseReturn.reset();
+			_reverseParams.reset();
+			cross_call_worker::ReverseCall("ParamAllPrimitives");
+			if (!_reverseReturn) {
+				test.Fail("Return not set");
+			} else if (*_reverseReturn != returnExpected) {
+				test.Fail(std::format("Wrong return {}, expected {}", *_reverseReturn, returnExpected));
+			}
+			if (!_reverseParams) {
+				test.Fail("Params not set");
+			} else if (*_reverseParams != paramsExpected) {
+				test.Fail(std::format("Wrong param values {}, expected {}", *_reverseParams, paramsExpected));
+			}
+		});
 #endif// TEST_CASES & TEST_REVERSE_PARAMS_ALL_PRIMITIVES
+	}
+
+public:
+	void ReverseReturn(const std::string& returnString) {
+		_reverseReturn = {returnString};
+	}
+	void ReverseParams(const std::string& paramsString) {
+		_reverseParams = {paramsString};
 	}
 
 private:
 	SimpleTests _tests;
+	std::optional<std::string> _reverseReturn;
+	std::optional<std::string> _reverseParams;
 };
 
 CrossCallMaster g_plugin;
 EXPOSE_PLUGIN(PLUGIN_API, &g_plugin)
+
+extern "C"
+PLUGIN_API void ReverseReturn(const std::string& returnString) {
+	g_plugin.ReverseReturn(returnString);
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnVoidCallback() {
+	return;
+}
+
+extern "C"
+PLUGIN_API bool NoParamReturnBoolCallback() {
+	return true;
+}
+
+extern "C"
+PLUGIN_API char NoParamReturnChar8Callback() {
+	return 'P';
+}
+
+extern "C"
+PLUGIN_API char16_t NoParamReturnChar16Callback() {
+	return u'Ф';
+}
+
+extern "C"
+PLUGIN_API int8_t NoParamReturnInt8Callback() {
+	return 123;
+}
+
+extern "C"
+PLUGIN_API int16_t NoParamReturnInt16Callback() {
+	return 32765;
+}
+
+extern "C"
+PLUGIN_API int32_t NoParamReturnInt32Callback() {
+	return 2112211221;
+}
+
+extern "C"
+PLUGIN_API int64_t NoParamReturnInt64Callback() {
+	return 0x7654321001234567;
+}
+
+extern "C"
+PLUGIN_API uint8_t NoParamReturnUInt8Callback() {
+	return 0xCD;
+}
+
+extern "C"
+PLUGIN_API uint16_t NoParamReturnUInt16Callback() {
+	return 0xCDCD;
+}
+
+extern "C"
+PLUGIN_API uint32_t NoParamReturnUInt32Callback() {
+	return 0xCDCDCDCD;
+}
+
+extern "C"
+PLUGIN_API uint64_t NoParamReturnUInt64Callback() {
+	return 0xCDCDCDCDCDCDCDCD;
+}
+
+extern "C"
+PLUGIN_API void* NoParamReturnPointerCallback() {
+	return reinterpret_cast<void*>(0xAABBCCDD87655678);
+}
+
+extern "C"
+PLUGIN_API float NoParamReturnFloatCallback() {
+	return 0.123f;
+}
+
+extern "C"
+PLUGIN_API double NoParamReturnDoubleCallback() {
+	return 987.321;
+}
+
+using NoParamReturnFunctionCallbackFunc = int32_t (*)();
+
+int32_t DaysInYear() {
+	return 365;
+}
+
+extern "C"
+PLUGIN_API NoParamReturnFunctionCallbackFunc NoParamReturnFunctionCallback() {
+	return &DaysInYear;
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnStringCallback(std::string& stringRet) {
+	std::construct_at(&stringRet, "Convertiplane");
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayBoolCallback(std::vector<bool>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<bool>{false, true, true});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayChar8Callback(std::vector<char>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<char>{'p', 'l', 'u', 'g'});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayChar16Callback(std::vector<char16_t>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<char16_t>{u'ч', u'а', u'р', u'!'});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayInt8Callback(std::vector<int8_t>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<int8_t>{10, -15, 20});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayInt16Callback(std::vector<int16_t>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<int16_t>{10, -15, 20, -25});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayInt32Callback(std::vector<int32_t>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<int32_t>{10, -15, 20, -25, 30});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayInt64Callback(std::vector<int64_t>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<int64_t>{10, -15, 20, -25, 30, -35});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayUInt8Callback(std::vector<uint8_t>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<uint8_t>{1, 2, 3, 200});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayUInt16Callback(std::vector<uint16_t>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<uint16_t>{1, 2, 3, 200, 60000});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayUInt32Callback(std::vector<uint32_t>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<uint32_t>{1, 2, 3, 200, 60000, 4000000000});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayUInt64Callback(std::vector<uint64_t>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<uint64_t>{1, 2, 3, 200, 60000, 4000000000, 12223334445556667778ULL});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayPointerCallback(std::vector<void*>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<void*>{reinterpret_cast<void*>(0x0), reinterpret_cast<void*>(0xdeadbeafLL), reinterpret_cast<void*>(0xcdccddcccdddcccc)});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayFloatCallback(std::vector<float>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<float>{1.1f, -10.82f, 555.555f});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayDoubleCallback(std::vector<double>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<double>{1.1, -10.82, 555.555, 55555.55555, 123456789.98765});
+}
+
+extern "C"
+PLUGIN_API void NoParamReturnArrayStringCallback(std::vector<std::string>& arrayRet) {
+	std::construct_at(&arrayRet, std::vector<std::string>{"5", "true", "0.0", "Hello", "And Goodbay", "Another long string to test. Pi equal 3,1415926535 8979323846 2643383279 5028841971 6939937510"});
+}
+
+extern "C"
+PLUGIN_API plugify::Vector2 NoParamReturnVector2Callback() {
+	return {100.9f, 200.8f};
+}
+
+extern "C"
+PLUGIN_API plugify::Vector3 NoParamReturnVector3Callback() {
+	return {100.9f, 200.8f, 300.7f};
+}
+
+extern "C"
+PLUGIN_API plugify::Vector4 NoParamReturnVector4Callback() {
+	return {100.9f, 200.8f, 300.7f, 400.6f};
+}
+
+extern "C"
+PLUGIN_API plugify::Matrix4x4 NoParamReturnMatrix4x4Callback() {
+	return {1.1f, 2.2f, 3.3f, 4.4f, 9.9f, 1.1f, 2.2f, 3.3f, 8.8f, 9.9f, 1.1f, 2.2f, 7.7f, 8.8f, 9.9f, 1.1f};
+}
+
+extern "C"
+PLUGIN_API void Param1Callback(int32_t a) {
+	g_plugin.ReverseParams(std::format("{}", a));
+}
+
+extern "C"
+PLUGIN_API void Param2Callback(int32_t a, float b) {
+	g_plugin.ReverseParams(std::format("{}|{}", a, b));
+}
+
+extern "C"
+PLUGIN_API void Param3Callback(int32_t a, float b, double c) {
+	g_plugin.ReverseParams(std::format("{}|{}|{}", a, b, c));
+}
+
+extern "C"
+PLUGIN_API void Param4Callback(int32_t a, float b, double c, const plugify::Vector4& d) {
+	g_plugin.ReverseParams(std::format("{}|{}|{}|{{{}, {}, {}, {}}}", a, b, c, d.x, d.y, d.z, d.w));
+}
+
+extern "C"
+PLUGIN_API void Param5Callback(int32_t a, float b, double c, const plugify::Vector4& d, const std::vector<int64_t>& e) {
+	std::string e_formated;
+	if (!e.empty()) {
+		e_formated = std::format("'{}'", e[0]);
+		for (auto it = std::next(e.begin()); it != e.end(); ++it) {
+			std::format_to(std::back_inserter(e_formated), ", '{}'", *it);
+		}
+	}
+	g_plugin.ReverseParams(std::format("{}|{}|{}|{{{}, {}, {}, {}}}|{{{}}}", a, b, c, d.x, d.y, d.z, d.w, e_formated));
+}
+
+extern "C"
+PLUGIN_API void Param6Callback(int32_t a, float b, double c, const plugify::Vector4& d, const std::vector<int64_t>& e, char f) {
+	std::string e_formated;
+	if (!e.empty()) {
+		e_formated = std::format("{}", e[0]);
+		for (auto it = std::next(e.begin()); it != e.end(); ++it) {
+			std::format_to(std::back_inserter(e_formated), ", {}", *it);
+		}
+	}
+	g_plugin.ReverseParams(std::format("{}|{}|{}|{{{}, {}, {}, {}}}|{{{}}}|{}", a, b, c, d.x, d.y, d.z, d.w, e_formated, static_cast<uint8_t>(f)));
+}
+
+extern "C"
+PLUGIN_API void Param7Callback(int32_t a, float b, double c, const plugify::Vector4& d, const std::vector<int64_t>& e, char f, const std::string& g) {
+	std::string e_formated;
+	if (!e.empty()) {
+		e_formated = std::format("{}", e[0]);
+		for (auto it = std::next(e.begin()); it != e.end(); ++it) {
+			std::format_to(std::back_inserter(e_formated), ", {}", *it);
+		}
+	}
+	g_plugin.ReverseParams(std::format("{}|{}|{}|{{{}, {}, {}, {}}}|{{{}}}|{}|{}", a, b, c, d.x, d.y, d.z, d.w, e_formated, static_cast<uint8_t>(f), g));
+}
+
+extern "C"
+PLUGIN_API void Param8Callback(int32_t a, float b, double c, const plugify::Vector4& d, const std::vector<int64_t>& e, char f, const std::string& g, char16_t h) {
+	std::string e_formated;
+	if (!e.empty()) {
+		e_formated = std::format("{}", e[0]);
+		for (auto it = std::next(e.begin()); it != e.end(); ++it) {
+			std::format_to(std::back_inserter(e_formated), ", {}", *it);
+		}
+	}
+	g_plugin.ReverseParams(std::format("{}|{}|{}|{{{}, {}, {}, {}}}|{{{}}}|{}|{}|{}", a, b, c, d.x, d.y, d.z, d.w, e_formated, static_cast<uint8_t>(f), g, static_cast<uint16_t>(h)));
+}
+
+extern "C"
+PLUGIN_API void Param9Callback(int32_t a, float b, double c, const plugify::Vector4& d, const std::vector<int64_t>& e, char f, const std::string& g, char16_t h, int16_t k) {
+	std::string e_formated;
+	if (!e.empty()) {
+		e_formated = std::format("{}", e[0]);
+		for (auto it = std::next(e.begin()); it != e.end(); ++it) {
+			std::format_to(std::back_inserter(e_formated), ", {}", *it);
+		}
+	}
+	g_plugin.ReverseParams(std::format("{}|{}|{}|{{{}, {}, {}, {}}}|{{{}}}|{}|{}|{}|{}", a, b, c, d.x, d.y, d.z, d.w, e_formated, static_cast<uint8_t>(f), g, static_cast<uint16_t>(h), k));
+}
+
+extern "C"
+PLUGIN_API void Param10Callback(int32_t a, float b, double c, const plugify::Vector4& d, const std::vector<int64_t>& e, char f, const std::string& g, char16_t h, int16_t k, void* l) {
+	std::string e_formated;
+	if (!e.empty()) {
+		e_formated = std::format("{}", e[0]);
+		for (auto it = std::next(e.begin()); it != e.end(); ++it) {
+			std::format_to(std::back_inserter(e_formated), ", {}", *it);
+		}
+	}
+	g_plugin.ReverseParams(std::format("{}|{}|{}|{{{}, {}, {}, {}}}|{{{}}}|{}|{}|{}|{}|{}", a, b, c, d.x, d.y, d.z, d.w, e_formated, static_cast<uint8_t>(f), g, static_cast<uint16_t>(h), k, l));
+}
+
+extern "C"
+PLUGIN_API void ParamRef1Callback(int32_t& a) {
+	a = 147;
+}
+
+extern "C"
+PLUGIN_API void ParamRef2Callback(int32_t& a, float& b) {
+	a = 852;
+	b = 0.1f;
+}
+
+extern "C"
+PLUGIN_API void ParamRef3Callback(int32_t& a, float& b, double& c) {
+	a = 369;
+	b = 0.2f;
+	c = 11111.11111;
+}
+
+extern "C"
+PLUGIN_API void ParamRef4Callback(int32_t& a, float& b, double& c, plugify::Vector4& d) {
+	a = 987;
+	b = 0.3f;
+	c = 22222.22222;
+	d = {4.4f, 3.3f, 2.2f, 1.1f};
+}
+
+extern "C"
+PLUGIN_API void ParamRef5Callback(int32_t& a, float& b, double& c, plugify::Vector4& d, std::vector<int64_t>& e) {
+	a = 456;
+	b = 0.4f;
+	c = 33333.33333;
+	d = {1.4f, 4.3f, 3.2f, 2.1f};
+	e = {};
+}
+
+extern "C"
+PLUGIN_API void ParamRef6Callback(int32_t& a, float& b, double& c, plugify::Vector4& d, std::vector<int64_t>& e, char& f) {
+	a = 321;
+	b = 0.5f;
+	c = 44444.44444;
+	d = {1.1f, 4.4f, 3.3f, 2.2f};
+	e = {99};
+	f = 'z';
+}
+
+extern "C"
+PLUGIN_API void ParamRef7Callback(int32_t& a, float& b, double& c, plugify::Vector4& d, std::vector<int64_t>& e, char& f, std::string& g) {
+	a = 157;
+	b = 0.6f;
+	c = 55555.55555;
+	d = {2.1f, 1.4f, 4.3f, 3.2f};
+	e = {99, 8888};
+	f = 'y';
+	g = "my string";
+}
+
+extern "C"
+PLUGIN_API void ParamRef8Callback(int32_t& a, float& b, double& c, plugify::Vector4& d, std::vector<int64_t>& e, char& f, std::string& g, char16_t& h) {
+	a = 759;
+	b = 0.7f;
+	c = 66666.66666;
+	d = {2.2f, 1.1f, 4.4f, 3.3f};
+	e = {99, 8888, 777777};
+	f = 'x';
+	g = "his string";
+	h = u'ъ';
+}
+
+extern "C"
+PLUGIN_API void ParamRef9Callback(int32_t& a, float& b, double& c, plugify::Vector4& d, std::vector<int64_t>& e, char& f, std::string& g, char16_t& h, int16_t& k) {
+	a = 953;
+	b = 0.8f;
+	c = 77777.77777;
+	d = {3.2f, 2.1f, 1.4f, 4.3f};
+	e = {99, 8888, 777777, 66666666};
+	f = 'w';
+	g = "her string";
+	h = u'ы';
+	k = -30003;
+}
+
+extern "C"
+PLUGIN_API void ParamRef10Callback(int32_t& a, float& b, double& c, plugify::Vector4& d, std::vector<int64_t>& e, char& f, std::string& g, char16_t& h, int16_t& k, void*& l) {
+	a = 351;
+	b = 0.9f;
+	c = 88888.88888;
+	d = {3.3f, 2.2f, 1.1f, 4.4f};
+	e = {99, 8888, 777777, 66666666, 5555555555};
+	f = 'v';
+	g = "they string";
+	h = u'ь';
+	k = 30003;
+	l = reinterpret_cast<void*>(0xabcdefLL);
+}
+
+extern "C"
+PLUGIN_API void ParamRefVectorsCallback(std::vector<bool>& p1, std::vector<char>& p2, std::vector<char16_t>& p3, std::vector<int8_t>& p4, std::vector<int16_t>& p5,
+	std::vector<int32_t>& p6, std::vector<int64_t>& p7, std::vector<uint8_t>& p8, std::vector<uint16_t>& p9, std::vector<uint32_t>& p10, std::vector<uint64_t>& p11,
+	std::vector<void*>& p12, std::vector<float>& p13, std::vector<double>& p14, std::vector<std::string>& p15
+) {
+	p1 = {true, false};
+	p2 = {'^'};
+	p3 = {u'я', u'ц'};
+	p4 = {-4, -3, -2, -1};
+	p5 = {-555, -444, -333};
+	p6 = {-66666, -77777};
+	p7 = {-7666555444};
+	p8 = {0, 1, 1, 2, 3, 5};
+	p9 = {32999};
+	p10 = {3000000000, 1};
+	p11 = {1, 22, 333, 4444, 55555, 999999999999};
+	p12 = {reinterpret_cast<void*>(13LL), reinterpret_cast<void*>(9LL), reinterpret_cast<void*>(5LL), reinterpret_cast<void*>(1LL)};
+	p13 = {91.23f, 12.34f, 23.45f, 8.08f};
+	p14 = {777.777777};
+	p15 = {"one", "1 two", "1 2 three"};
+}
+
+extern "C"
+PLUGIN_API int64_t ParamAllPrimitivesCallback(bool p1, char p2, char16_t p3, int8_t p4, int16_t p5, int32_t p6, int64_t p7, uint8_t p8, uint16_t p9, uint32_t p10,
+	uint64_t p11, void* p12, float p13, double p14
+) {
+	g_plugin.ReverseParams(std::format("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}", p1, static_cast<uint8_t>(p2), static_cast<uint16_t>(p3), p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14));
+	return 65;
+}
