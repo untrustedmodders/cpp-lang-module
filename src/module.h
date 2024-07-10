@@ -1,11 +1,9 @@
-#include "assembly.h"
-#include <plugify/compat_format.h>
-#include <plugify/plugin_descriptor.h>
+#include <plugify/assembly.h>
 #include <plugify/plugin.h>
 #include <plugify/plugify_provider.h>
 #include <plugify/language_module.h>
 #include <plugify/cpp_plugin.h>
-#include <plugify/log.h>
+
 #include <module_export.h>
 #include <unordered_map>
 #include <map>
@@ -14,13 +12,14 @@
 namespace cpplm {
 	class AssemblyHolder {
 	public:
-		AssemblyHolder(std::unique_ptr<Assembly> assembly, plugify::StartFunc startFunc, plugify::EndFunc endFunc) : _assembly{std::move(assembly)}, _startFunc{startFunc}, _endFunc{endFunc} {}
+		AssemblyHolder(std::unique_ptr<plugify::Assembly> assembly, plugify::StartFunc startFunc, plugify::EndFunc endFunc) : _assembly{std::move(assembly)}, _startFunc{startFunc}, _endFunc{endFunc} {}
 
+		plugify::Assembly& GetAssembly() const { return *_assembly; }
 		plugify::StartFunc GetStartFunc() const { return _startFunc; }
 		plugify::EndFunc GetEndFunc() const { return _endFunc; }
 
 	private:
-		std::unique_ptr<Assembly> _assembly;
+		std::unique_ptr<plugify::Assembly> _assembly;
 		plugify::StartFunc _startFunc{ nullptr };
 		plugify::EndFunc _endFunc{ nullptr };
 	};
@@ -38,12 +37,12 @@ namespace cpplm {
 		void OnPluginEnd(const plugify::IPlugin& plugin) override;
 
 		const std::shared_ptr<plugify::IPlugifyProvider>& GetProvider() { return _provider; }
-		void* GetNativeMethod(const std::string& methodName) const;
+		plugify::MemAddr GetNativeMethod(const std::string& methodName) const;
 
 	private:
 		std::shared_ptr<plugify::IPlugifyProvider> _provider;
 		std::map<plugify::UniqueId, AssemblyHolder> _assemblyMap;
-		std::unordered_map<std::string, void*> _nativesMap;
+		std::unordered_map<std::string, plugify::MemAddr> _nativesMap;
 
 		static const std::array<void*, 14> _pluginApi;
 	};

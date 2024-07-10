@@ -1,5 +1,13 @@
 #include "module.h"
 
+#include <plugify/mem_addr.h>
+#include <plugify/mem_accessor.h>
+#include <plugify/mem_protector.h>
+#include <plugify/compat_format.h>
+#include <plugify/plugin_descriptor.h>
+#include <plugify/plugin.h>
+#include <plugify/log.h>
+
 using namespace plugify;
 using namespace cpplm;
 namespace fs = std::filesystem;
@@ -19,6 +27,20 @@ InitResult CppLanguageModule::Initialize(std::weak_ptr<IPlugifyProvider> provide
 
 void CppLanguageModule::Shutdown() {
 	_nativesMap.clear();
+#if CPPLM_PLATFORM_LINUX || CPPLM_PLATFORM_APPLE
+#if CPPLM_PLATFORM_LINUX
+	constexpr auto name = ".bss";
+#else
+	constexpr auto name = "__BSS";
+#endif
+	for (auto& [_, holder] : _assemblyMap) {
+		auto bss = holder.GetAssembly().GetSectionByName(name);
+		if (bss.IsValid()) {
+			MemProtector protector(bss.base, bss.size, ProtFlag::RWX);
+			std::memset(bss.base, 0, bss.size);
+		}
+	}
+#endif
 	_assemblyMap.clear();
 	_provider.reset();
 }
@@ -34,24 +56,36 @@ LoadResult CppLanguageModule::OnPluginLoad(const IPlugin& plugin) {
 	fs::path entryPoint(plugin.GetDescriptor().entryPoint);
 	fs::path assemblyPath(plugin.GetBaseDir() / entryPoint.parent_path() / std::format(CPPLM_LIBRARY_PREFIX "{}" CPPLM_LIBRARY_SUFFIX, entryPoint.filename().string()));
 
-	auto assembly = Assembly::LoadFromPath(assemblyPath, _provider->IsPreferOwnSymbols());
-	if (!assembly) {
-		return ErrorData{ std::format("Failed to load assembly: {}", Assembly::GetError()) };
+#if CPPLM_PLATFORM_WINDOWS
+	LoadFlag flags = LoadFlag::PinInMemory;
+	bool sections = false;
+#elif CPPLM_PLATFORM_LINUX || CPPLM_PLATFORM_APPLE
+	LoadFlag flags = LoadFlag::Lazy;
+	bool sections = true;
+	if (_provider->IsPreferOwnSymbols())
+		flags |= LoadFlag::Deepbind;
+#else
+	#error "Platform is not supported!"
+#endif
+
+	auto assembly = std::make_unique<Assembly>(assemblyPath, flags, sections);
+	if (!assembly->IsValid()) {
+		return ErrorData{ std::format("Failed to load assembly: {}", assembly->GetError()) };
 	}
 
 	std::vector<std::string_view> funcErrors;
 
-	auto* const initFunc = assembly->GetFunction<InitFunc>("Plugify_Init");
+	auto* const initFunc = assembly->GetFunctionByName("Plugify_Init").RCast<InitFunc>();
 	if (!initFunc) {
 		funcErrors.emplace_back("Plugify_Init");
 	}
 
-	auto* const startFunc = assembly->GetFunction<StartFunc>("Plugify_PluginStart");
+	auto* const startFunc = assembly->GetFunctionByName("Plugify_PluginStart").RCast<StartFunc>();
 	if (!startFunc) {
 		funcErrors.emplace_back("Plugify_PluginStart");
 	}
 
-	auto* const endFunc = assembly->GetFunction<EndFunc>("Plugify_PluginEnd");
+	auto* const endFunc = assembly->GetFunctionByName("Plugify_PluginEnd").RCast<EndFunc>();
 	if (!endFunc) {
 		funcErrors.emplace_back("Plugify_PluginEnd");
 	}
@@ -71,7 +105,7 @@ LoadResult CppLanguageModule::OnPluginLoad(const IPlugin& plugin) {
 	methods.reserve(exportedMethods.size());
 
 	for (const auto& method : exportedMethods) {
-		if (auto* const func = assembly->GetFunction(method.funcName.c_str())) {
+		if (auto const func = assembly->GetFunctionByName(method.funcName)) {
 			methods.emplace_back(method.name, func);
 		} else {
 			funcErrors.emplace_back(method.name);
@@ -113,9 +147,9 @@ void CppLanguageModule::OnPluginEnd(const IPlugin& plugin) {
 }
 
 // Plugin API methods
-void* CppLanguageModule::GetNativeMethod(const std::string& methodName) const {
+plugify::MemAddr CppLanguageModule::GetNativeMethod(const std::string& methodName) const {
 	if (const auto it = _nativesMap.find(methodName); it != _nativesMap.end()) {
-		return std::get<void*>(*it);
+		return std::get<MemAddr>(*it);
 	}
 	_provider->Log(std::format(LOG_PREFIX "GetNativeMethod failed to find {}", methodName), Severity::Fatal);
 	return nullptr;
