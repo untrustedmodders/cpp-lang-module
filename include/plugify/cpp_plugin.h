@@ -37,7 +37,7 @@ namespace plugify {
 		using GetBaseDirFn = const std::filesystem::path& (*)(void*);
 		using GetDependenciesFn = std::vector<std::string_view> (*)(void*);
 		using FindResourceFn = std::optional<std::filesystem::path> (*)(void*, const std::filesystem::path&);
-
+		extern void* handle;
 		extern GetIdFn GetId;
 		extern GetNameFn GetName;
 		extern GetFullNameFn GetFullName;
