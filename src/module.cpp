@@ -4,6 +4,7 @@
 #include <plugify/mem_accessor.h>
 #include <plugify/mem_protector.h>
 #include <plugify/compat_format.h>
+#include <plugify/plugin_reference_descriptor.h>
 #include <plugify/plugin_descriptor.h>
 #include <plugify/plugin.h>
 #include <plugify/log.h>
@@ -15,7 +16,7 @@ namespace fs = std::filesystem;
 #define LOG_PREFIX "[CPPLM] "
 
 // ILanguageModule
-InitResult CppLanguageModule::Initialize(std::weak_ptr<IPlugifyProvider> provider, const IModule& /*module*/) {
+InitResult CppLanguageModule::Initialize(std::weak_ptr<IPlugifyProvider> provider, IModule /*module*/) {
 	if (!(_provider = provider.lock())) {
 		return ErrorData{ "Provider not exposed" };
 	}
@@ -29,9 +30,9 @@ void CppLanguageModule::Shutdown() {
 	_nativesMap.clear();
 #if CPPLM_PLATFORM_LINUX || CPPLM_PLATFORM_APPLE
 #if CPPLM_PLATFORM_LINUX
-	constexpr auto name = ".bss";
+	const auto name = ".bss";
 #else
-	constexpr auto name = "__BSS";
+	const auto name = "__BSS";
 #endif
 	for (auto& [_, holder] : _assemblyMap) {
 		auto bss = holder.GetAssembly().GetSectionByName(name);
@@ -45,28 +46,26 @@ void CppLanguageModule::Shutdown() {
 	_provider.reset();
 }
 
-void CppLanguageModule::OnMethodExport(const IPlugin& plugin) {
-	const auto& pluginName = plugin.GetName();
+void CppLanguageModule::OnMethodExport(IPlugin plugin) {
+	auto pluginName = plugin.GetName();
 	for (const auto& [name, addr] : plugin.GetMethods()) {
 		_nativesMap.try_emplace(std::format("{}.{}", pluginName, name), addr);
 	}
 }
 
-LoadResult CppLanguageModule::OnPluginLoad(const IPlugin& plugin) {
-	fs::path entryPoint(plugin.GetDescriptor().entryPoint);
+LoadResult CppLanguageModule::OnPluginLoad(IPlugin plugin) {
+	fs::path entryPoint(plugin.GetDescriptor().GetEntryPoint());
 	fs::path assemblyPath(plugin.GetBaseDir() / entryPoint.parent_path() / std::format(CPPLM_LIBRARY_PREFIX "{}" CPPLM_LIBRARY_SUFFIX, entryPoint.filename().string()));
 
-#if CPPLM_PLATFORM_WINDOWS
-	LoadFlag flags = LoadFlag::PinInMemory;
-	bool sections = false;
-#elif CPPLM_PLATFORM_LINUX || CPPLM_PLATFORM_APPLE
+#if CPPLM_PLATFORM_LINUX || CPPLM_PLATFORM_APPLE
+	const bool sections = true;
+#else
+	const bool sections = false;
+#endif
+
 	LoadFlag flags = LoadFlag::Lazy;
-	bool sections = true;
 	if (_provider->IsPreferOwnSymbols())
 		flags |= LoadFlag::Deepbind;
-#else
-	#error "Platform is not supported!"
-#endif
 
 	auto assembly = std::make_unique<Assembly>(assemblyPath, flags, sections);
 	if (!assembly->IsValid()) {
@@ -100,15 +99,15 @@ LoadResult CppLanguageModule::OnPluginLoad(const IPlugin& plugin) {
 
 	funcErrors.clear();
 
-	const auto& exportedMethods = plugin.GetDescriptor().exportedMethods;
+	std::vector<IMethod> exportedMethods = plugin.GetDescriptor().GetExportedMethods();
 	std::vector<MethodData> methods;
 	methods.reserve(exportedMethods.size());
 
 	for (const auto& method : exportedMethods) {
-		if (auto const func = assembly->GetFunctionByName(method.funcName)) {
-			methods.emplace_back(method.name, func);
+		if (auto const func = assembly->GetFunctionByName(method.GetFunctionName())) {
+			methods.emplace_back(method.GetName(), func);
 		} else {
-			funcErrors.emplace_back(method.name);
+			funcErrors.emplace_back(method.GetName());
 		}
 	}
 	if (!funcErrors.empty()) {
@@ -119,7 +118,12 @@ LoadResult CppLanguageModule::OnPluginLoad(const IPlugin& plugin) {
 		return ErrorData{ std::format("Not found {} method function(s)", funcs) };
 	}
 
-	const int resultVersion = initFunc(_pluginApi.data(), kApiVersion, &plugin);
+	union {
+		IPlugin plugin;
+		void* ptr;
+	} cast{plugin};
+
+	const int resultVersion = initFunc(_pluginApi, kApiVersion, cast.ptr);
 	if (resultVersion != 0) {
 		return ErrorData{ std::format("Not supported plugin api {}, max supported {}", resultVersion, kApiVersion) };
 	}
@@ -132,14 +136,14 @@ LoadResult CppLanguageModule::OnPluginLoad(const IPlugin& plugin) {
 	return LoadResultData{ std::move(methods) };
 }
 
-void CppLanguageModule::OnPluginStart(const IPlugin& plugin) {
+void CppLanguageModule::OnPluginStart(IPlugin plugin) {
 	if (const auto it = _assemblyMap.find(plugin.GetId()); it != _assemblyMap.end()) {
 		const auto& assemblyHolder = std::get<AssemblyHolder>(*it);
 		assemblyHolder.GetStartFunc()();
 	}
 }
 
-void CppLanguageModule::OnPluginEnd(const IPlugin& plugin) {
+void CppLanguageModule::OnPluginEnd(IPlugin plugin) {
 	if (const auto it = _assemblyMap.find(plugin.GetId()); it != _assemblyMap.end()) {
 		const auto& assemblyHolder = std::get<AssemblyHolder>(*it);
 		assemblyHolder.GetEndFunc()();
@@ -147,7 +151,7 @@ void CppLanguageModule::OnPluginEnd(const IPlugin& plugin) {
 }
 
 // Plugin API methods
-plugify::MemAddr CppLanguageModule::GetNativeMethod(const std::string& methodName) const {
+MemAddr CppLanguageModule::GetNativeMethod(std::string_view methodName) const {
 	if (const auto it = _nativesMap.find(methodName); it != _nativesMap.end()) {
 		return std::get<MemAddr>(*it);
 	}
@@ -159,7 +163,7 @@ namespace cpplm {
 	CppLanguageModule g_cpplm;
 }
 
-void* GetMethodPtr(const std::string& methodName) {
+void* GetMethodPtr(std::string_view methodName) {
 	return g_cpplm.GetNativeMethod(methodName);
 }
 
@@ -167,61 +171,61 @@ const fs::path& GetBaseDir() {
 	return g_cpplm.GetProvider()->GetBaseDir();
 }
 
-bool IsModuleLoaded(const std::string& moduleName, std::optional<int32_t> requiredVersion, bool minimum) {
+bool IsModuleLoaded(std::string_view moduleName, std::optional<int32_t> requiredVersion, bool minimum) {
 	return g_cpplm.GetProvider()->IsModuleLoaded(moduleName, requiredVersion, minimum);
 }
 
-bool IsPluginLoaded(const std::string& pluginName, std::optional<int32_t> requiredVersion, bool minimum) {
+bool IsPluginLoaded(std::string_view pluginName, std::optional<int32_t> requiredVersion, bool minimum) {
 	return g_cpplm.GetProvider()->IsPluginLoaded(pluginName, requiredVersion, minimum);
 }
 
-UniqueId GetPluginId(const plugify::IPlugin& plugin) {
+UniqueId GetPluginId(IPlugin plugin) {
 	return plugin.GetId();
 }
 
-const std::string& GetPluginName(const plugify::IPlugin& plugin) {
+std::string_view GetPluginName(IPlugin plugin) {
 	return plugin.GetName();
 }
 
-const std::string& GetPluginFullName(const plugify::IPlugin& plugin) {
+std::string_view GetPluginFullName(IPlugin plugin) {
 	return plugin.GetFriendlyName();
 }
 
-const std::string& GetPluginDescription(const plugify::IPlugin& plugin) {
-	return plugin.GetDescriptor().description;
+std::string_view GetPluginDescription(IPlugin plugin) {
+	return plugin.GetDescriptor().GetDescription();
 }
 
-const std::string& GetPluginVersion(const plugify::IPlugin& plugin) {
-	return plugin.GetDescriptor().versionName;
+std::string_view GetPluginVersion(IPlugin plugin) {
+	return plugin.GetDescriptor().GetVersionName();
 }
 
-const std::string& GetPluginAuthor(const plugify::IPlugin& plugin) {
-	return plugin.GetDescriptor().createdBy;
+std::string_view GetPluginAuthor(IPlugin plugin) {
+	return plugin.GetDescriptor().GetCreatedBy();
 }
 
-const std::string& GetPluginWebsite(const plugify::IPlugin& plugin) {
-	return plugin.GetDescriptor().createdByURL;
+std::string_view GetPluginWebsite(IPlugin plugin) {
+	return plugin.GetDescriptor().GetCreatedByURL();
 }
 
-const fs::path& GetPluginBaseDir(const plugify::IPlugin& plugin) {
+const fs::path& GetPluginBaseDir(IPlugin plugin) {
 	return plugin.GetBaseDir();
 }
 
-std::vector<std::string_view> GetPluginDependencies(const plugify::IPlugin& plugin) {
-	const auto& desc = plugin.GetDescriptor();
-	std::vector<std::string_view> deps;
-	deps.reserve(desc.dependencies.size());
-	for (const auto& dependency : desc.dependencies) {
-		deps.emplace_back(dependency.name);
+std::vector<std::string_view> GetPluginDependencies(IPlugin plugin) {
+	std::vector<IPluginReferenceDescriptor> deps = plugin.GetDescriptor().GetDependencies();
+	std::vector<std::string_view> dependencies;
+	dependencies.reserve(deps.size());
+	for (const auto& dependency : deps) {
+		dependencies.emplace_back(dependency.GetName());
 	}
-	return deps;
+	return dependencies;
 }
 
-std::optional<fs::path> FindPluginResource(const plugify::IPlugin& plugin, const fs::path& path) {
+std::optional<fs::path> FindPluginResource(IPlugin plugin, const fs::path& path) {
 	return plugin.FindResource(path);
 }
 
-const std::array<void*, 14> CppLanguageModule::_pluginApi = {
+std::array<void*, 14> CppLanguageModule::_pluginApi = {
 		reinterpret_cast<void*>(&::GetMethodPtr),
 		reinterpret_cast<void*>(&::GetBaseDir),
 		reinterpret_cast<void*>(&::IsModuleLoaded),
