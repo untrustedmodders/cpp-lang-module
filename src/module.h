@@ -43,12 +43,12 @@ namespace cpplm {
 		CppLanguageModule() = default;
 
 		// ILanguageModule
-		plugify::InitResult Initialize(std::weak_ptr<plugify::IPlugifyProvider> provider, plugify::IModule module) override;
+		plugify::InitResult Initialize(std::weak_ptr<plugify::IPlugifyProvider> provider, plugify::ModuleRef module) override;
 		void Shutdown() override;
-		void OnMethodExport(plugify::IPlugin plugin) override;
-		plugify::LoadResult OnPluginLoad(plugify::IPlugin plugin) override;
-		void OnPluginStart(plugify::IPlugin plugin) override;
-		void OnPluginEnd(plugify::IPlugin plugin) override;
+		void OnMethodExport(plugify::PluginRef plugin) override;
+		plugify::LoadResult OnPluginLoad(plugify::PluginRef plugin) override;
+		void OnPluginStart(plugify::PluginRef plugin) override;
+		void OnPluginEnd(plugify::PluginRef plugin) override;
 
 		const std::shared_ptr<plugify::IPlugifyProvider>& GetProvider() { return _provider; }
 		plugify::MemAddr GetNativeMethod(std::string_view methodName) const;

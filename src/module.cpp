@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 #define LOG_PREFIX "[CPPLM] "
 
 // ILanguageModule
-InitResult CppLanguageModule::Initialize(std::weak_ptr<IPlugifyProvider> provider, IModule /*module*/) {
+InitResult CppLanguageModule::Initialize(std::weak_ptr<IPlugifyProvider> provider, ModuleRef /*module*/) {
 	if (!(_provider = provider.lock())) {
 		return ErrorData{ "Provider not exposed" };
 	}
@@ -36,14 +36,14 @@ void CppLanguageModule::Shutdown() {
 	_provider.reset();
 }
 
-void CppLanguageModule::OnMethodExport(IPlugin plugin) {
+void CppLanguageModule::OnMethodExport(PluginRef plugin) {
 	auto pluginName = plugin.GetName();
 	for (const auto& [name, addr] : plugin.GetMethods()) {
 		_nativesMap.try_emplace(std::format("{}.{}", pluginName, name), addr);
 	}
 }
 
-LoadResult CppLanguageModule::OnPluginLoad(IPlugin plugin) {
+LoadResult CppLanguageModule::OnPluginLoad(PluginRef plugin) {
 	fs::path entryPoint(plugin.GetDescriptor().GetEntryPoint());
 	fs::path assemblyPath(plugin.GetBaseDir() / entryPoint.parent_path() / std::format(CPPLM_LIBRARY_PREFIX "{}" CPPLM_LIBRARY_SUFFIX, entryPoint.filename().string()));
 
@@ -89,7 +89,7 @@ LoadResult CppLanguageModule::OnPluginLoad(IPlugin plugin) {
 
 	funcErrors.clear();
 
-	std::vector<IMethod> exportedMethods = plugin.GetDescriptor().GetExportedMethods();
+	std::vector<MethodRef> exportedMethods = plugin.GetDescriptor().GetExportedMethods();
 	std::vector<MethodData> methods;
 	methods.reserve(exportedMethods.size());
 
@@ -109,7 +109,7 @@ LoadResult CppLanguageModule::OnPluginLoad(IPlugin plugin) {
 	}
 
 	union {
-		IPlugin plugin;
+		PluginRef plugin;
 		void* ptr;
 	} cast{plugin};
 
@@ -126,14 +126,14 @@ LoadResult CppLanguageModule::OnPluginLoad(IPlugin plugin) {
 	return LoadResultData{ std::move(methods) };
 }
 
-void CppLanguageModule::OnPluginStart(IPlugin plugin) {
+void CppLanguageModule::OnPluginStart(PluginRef plugin) {
 	if (const auto it = _assemblyMap.find(plugin.GetId()); it != _assemblyMap.end()) {
 		const auto& assemblyHolder = std::get<AssemblyHolder>(*it);
 		assemblyHolder.GetStartFunc()();
 	}
 }
 
-void CppLanguageModule::OnPluginEnd(IPlugin plugin) {
+void CppLanguageModule::OnPluginEnd(PluginRef plugin) {
 	if (const auto it = _assemblyMap.find(plugin.GetId()); it != _assemblyMap.end()) {
 		const auto& assemblyHolder = std::get<AssemblyHolder>(*it);
 		assemblyHolder.GetEndFunc()();
@@ -182,40 +182,40 @@ bool IsPluginLoaded(std::string_view pluginName, std::optional<int32_t> required
 	return g_cpplm.GetProvider()->IsPluginLoaded(pluginName, requiredVersion, minimum);
 }
 
-UniqueId GetPluginId(IPlugin plugin) {
+UniqueId GetPluginId(PluginRef plugin) {
 	return plugin.GetId();
 }
 
-std::string_view GetPluginName(IPlugin plugin) {
+std::string_view GetPluginName(PluginRef plugin) {
 	return plugin.GetName();
 }
 
-std::string_view GetPluginFullName(IPlugin plugin) {
+std::string_view GetPluginFullName(PluginRef plugin) {
 	return plugin.GetFriendlyName();
 }
 
-std::string_view GetPluginDescription(IPlugin plugin) {
+std::string_view GetPluginDescription(PluginRef plugin) {
 	return plugin.GetDescriptor().GetDescription();
 }
 
-std::string_view GetPluginVersion(IPlugin plugin) {
+std::string_view GetPluginVersion(PluginRef plugin) {
 	return plugin.GetDescriptor().GetVersionName();
 }
 
-std::string_view GetPluginAuthor(IPlugin plugin) {
+std::string_view GetPluginAuthor(PluginRef plugin) {
 	return plugin.GetDescriptor().GetCreatedBy();
 }
 
-std::string_view GetPluginWebsite(IPlugin plugin) {
+std::string_view GetPluginWebsite(PluginRef plugin) {
 	return plugin.GetDescriptor().GetCreatedByURL();
 }
 
-const fs::path& GetPluginBaseDir(IPlugin plugin) {
+const fs::path& GetPluginBaseDir(PluginRef plugin) {
 	return plugin.GetBaseDir();
 }
 
-std::vector<std::string_view> GetPluginDependencies(IPlugin plugin) {
-	std::vector<IPluginReferenceDescriptor> deps = plugin.GetDescriptor().GetDependencies();
+std::vector<std::string_view> GetPluginDependencies(PluginRef plugin) {
+	std::vector<PluginReferenceDescriptorRef> deps = plugin.GetDescriptor().GetDependencies();
 	std::vector<std::string_view> dependencies;
 	dependencies.reserve(deps.size());
 	for (const auto& dependency : deps) {
@@ -224,7 +224,7 @@ std::vector<std::string_view> GetPluginDependencies(IPlugin plugin) {
 	return dependencies;
 }
 
-std::optional<fs::path> FindPluginResource(IPlugin plugin, const fs::path& path) {
+std::optional<fs::path> FindPluginResource(PluginRef plugin, const fs::path& path) {
 	return plugin.FindResource(path);
 }
 
