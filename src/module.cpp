@@ -89,7 +89,7 @@ LoadResult CppLanguageModule::OnPluginLoad(PluginRef plugin) {
 
 	funcErrors.clear();
 
-	std::vector<MethodRef> exportedMethods = plugin.GetDescriptor().GetExportedMethods();
+	std::span<const MethodRef> exportedMethods = plugin.GetDescriptor().GetExportedMethods();
 	std::vector<MethodData> methods;
 	methods.reserve(exportedMethods.size());
 
@@ -215,13 +215,13 @@ const fs::path& GetPluginBaseDir(PluginRef plugin) {
 }
 
 std::vector<std::string_view> GetPluginDependencies(PluginRef plugin) {
-	std::vector<PluginReferenceDescriptorRef> deps = plugin.GetDescriptor().GetDependencies();
-	std::vector<std::string_view> dependencies;
-	dependencies.reserve(deps.size());
-	for (const auto& dependency : deps) {
-		dependencies.emplace_back(dependency.GetName());
+	std::span<const PluginReferenceDescriptorRef> dependencies = plugin.GetDescriptor().GetDependencies();
+	std::vector<std::string_view> deps;
+	deps.reserve(dependencies.size());
+	for (const auto& dependency : dependencies) {
+		deps.emplace_back(dependency.GetName());
 	}
-	return dependencies;
+	return deps;
 }
 
 std::optional<fs::path> FindPluginResource(PluginRef plugin, const fs::path& path) {
