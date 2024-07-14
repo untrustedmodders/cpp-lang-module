@@ -27,21 +27,11 @@ InitResult CppLanguageModule::Initialize(std::weak_ptr<IPlugifyProvider> provide
 }
 
 void CppLanguageModule::Shutdown() {
-	_nativesMap.clear();
-#if CPPLM_PLATFORM_LINUX || CPPLM_PLATFORM_APPLE
-#if CPPLM_PLATFORM_LINUX
-	const auto name = ".bss";
-#else
-	const auto name = "__BSS";
-#endif
-	for (auto& [_, holder] : _assemblyMap) {
-		auto bss = holder.GetAssembly().GetSectionByName(name);
-		if (bss.IsValid()) {
-			MemProtector protector(bss.base, bss.size, ProtFlag::RWX);
-			std::memset(bss.base, 0, bss.size);
-		}
+	for (MemAddr* addr : _addresses) {
+		*addr = nullptr;
 	}
-#endif
+	_nativesMap.clear();
+	_addresses.clear();
 	_assemblyMap.clear();
 	_provider.reset();
 }
@@ -159,12 +149,25 @@ MemAddr CppLanguageModule::GetNativeMethod(std::string_view methodName) const {
 	return nullptr;
 }
 
+void CppLanguageModule::GetNativeMethod(std::string_view methodName, plugify::MemAddr* addressDest) {
+	if (const auto it = _nativesMap.find(methodName); it != _nativesMap.end()) {
+		*addressDest = std::get<MemAddr>(*it);
+		_addresses.emplace_back(addressDest);
+		return;
+	}
+	_provider->Log(std::format(LOG_PREFIX "GetNativeMethod failed to find: '{}'", methodName), Severity::Fatal);
+}
+
 namespace cpplm {
 	CppLanguageModule g_cpplm;
 }
 
 void* GetMethodPtr(std::string_view methodName) {
 	return g_cpplm.GetNativeMethod(methodName);
+}
+
+void GetMethodPtr2(std::string_view methodName, MemAddr* addressDest) {
+	g_cpplm.GetNativeMethod(methodName, addressDest);
 }
 
 const fs::path& GetBaseDir() {
@@ -225,8 +228,9 @@ std::optional<fs::path> FindPluginResource(IPlugin plugin, const fs::path& path)
 	return plugin.FindResource(path);
 }
 
-std::array<void*, 14> CppLanguageModule::_pluginApi = {
+std::array<void*, 15> CppLanguageModule::_pluginApi = {
 		reinterpret_cast<void*>(&::GetMethodPtr),
+		reinterpret_cast<void*>(&::GetMethodPtr2),
 		reinterpret_cast<void*>(&::GetBaseDir),
 		reinterpret_cast<void*>(&::IsModuleLoaded),
 		reinterpret_cast<void*>(&::IsPluginLoaded),

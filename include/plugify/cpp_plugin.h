@@ -19,11 +19,13 @@ namespace plugify {
 	using EndFunc = void (*)();
 
 	using GetMethodPtrFn = void* (*)(std::string_view);
+	using GetMethodPtr2Fn = void (*)(std::string_view, void**);
 	using GetBaseDirFn = const std::filesystem::path& (*)();
 	using IsModuleLoadedFn = bool (*)(std::string_view, std::optional<int32_t>, bool);
 	using IsPluginLoadedFn = bool (*)(std::string_view, std::optional<int32_t>, bool);
 
 	extern GetMethodPtrFn GetMethodPtr;
+	extern GetMethodPtr2Fn GetMethodPtr2;
 	extern GetBaseDirFn GetBaseDir;
 	extern IsModuleLoadedFn IsModuleLoaded;
 	extern IsPluginLoadedFn IsPluginLoaded;
@@ -80,6 +82,7 @@ namespace plugify {
 
 #define EXPOSE_PLUGIN(plugin_api, interface_addr) namespace plugify { \
 	GetMethodPtrFn GetMethodPtr{ nullptr }; \
+	GetMethodPtr2Fn GetMethodPtr2{ nullptr }; \
 	GetBaseDirFn GetBaseDir{ nullptr }; \
 	IsModuleLoadedFn IsModuleLoaded{ nullptr }; \
 	IsPluginLoadedFn IsPluginLoaded{ nullptr }; \
@@ -103,6 +106,7 @@ namespace plugify {
 		} \
 		size_t i = 0; \
 		GetMethodPtr = reinterpret_cast<GetMethodPtrFn>(api[i++]); \
+		GetMethodPtr2 = reinterpret_cast<GetMethodPtr2Fn>(api[i++]); \
 		GetBaseDir = reinterpret_cast<GetBaseDirFn>(api[i++]); \
 		IsModuleLoaded = reinterpret_cast<IsModuleLoadedFn>(api[i++]); \
 		IsPluginLoaded = reinterpret_cast<IsPluginLoadedFn>(api[i++]); \

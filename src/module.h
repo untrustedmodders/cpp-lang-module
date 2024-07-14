@@ -52,13 +52,17 @@ namespace cpplm {
 
 		const std::shared_ptr<plugify::IPlugifyProvider>& GetProvider() { return _provider; }
 		plugify::MemAddr GetNativeMethod(std::string_view methodName) const;
+		void GetNativeMethod(std::string_view methodName, plugify::MemAddr* addressDest);
 
 	private:
 		std::shared_ptr<plugify::IPlugifyProvider> _provider;
+		
 		std::map<plugify::UniqueId, AssemblyHolder> _assemblyMap;
 		std::unordered_map<std::string, plugify::MemAddr, string_hash, std::equal_to<>> _nativesMap;
+		
+		std::vector<plugify::MemAddr*> _addresses;
 
-		static std::array<void*, 14> _pluginApi;
+		static std::array<void*, 15> _pluginApi;
 	};
 
 	extern CppLanguageModule g_cpplm;

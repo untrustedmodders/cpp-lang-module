@@ -242,8 +242,8 @@ def main(manifest_path, output_dir, override):
                     f'{method["name"]}({gen_params_string(method["paramTypes"], ParamGen.TypesNames)}) {{\n')
         content += (f'\t\tusing {method["name"]}Fn = {return_type} '
                     f'(*)({gen_params_string(method["paramTypes"], ParamGen.Types)});\n')
-        content += (f'\t\tstatic auto __func = '
-                    f'reinterpret_cast<{method["name"]}Fn>(plugify::GetMethodPtr("{plugin_name}.{method["name"]}"));\n')
+        content += f'\t\tstatic {method['name']}Fn __func = nullptr;\n'
+        content += f'\t\tif (__func == nullptr) plugify::GetMethodPtr2("{plugin_name}.{method['name']}", reinterpret_cast<void**>(&__func));\n'
         content += (f'\t\t{"return " if ret_type["type"] != "void" else ""}'
                     f'__func({gen_params_string(method["paramTypes"], ParamGen.Names)});\n')
         content += '\t}\n'
