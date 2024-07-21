@@ -53,11 +53,11 @@ void SimpleTests::Run() {
 		test.Run();
 		if (test.IsFailed()) {
 			++failed;
-			std::cout << "Failed\n";
+			std::cerr << "Failed\n";
 			for (const auto& error : test.GetErrors()) {
-				std::cout << "    " << error << "\n";
+				std::cerr << "    " << error << "\n";
 			}
-			std::cout << std::flush;
+			std::cerr << std::flush;
 		} else {
 			++success;
 			std::cout << "Success" << std::endl;
@@ -65,4 +65,8 @@ void SimpleTests::Run() {
 	}
 	
 	std::cout << std::format("Tests finished: {} success, {} failed, {} total", success, failed, count) << std::endl;
+}
+
+void SimpleTests::Reset() {
+    _tests.clear();
 }

@@ -42,6 +42,10 @@ class CrossCallMaster : public plugify::IPluginEntry {
 		_tests.Run();
 	}
 
+    void OnPluginEnd() override {
+        _tests.Reset();
+    };
+
 	void NoParamOnlyReturn() {
 #if TEST_CASES & TEST_NO_PARAM_ONLY_RETURN_PRIMITIVES
 		_tests.Add("NoParamReturnVoid", [](SimpleTests::Test& /*test*/) {

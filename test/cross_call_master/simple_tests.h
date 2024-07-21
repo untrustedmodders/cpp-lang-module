@@ -29,6 +29,7 @@ public:
 public:
 	void Add(std::string name, std::function<void(Test&)> func);
 	void Run();
+	void Reset();
 
 private:
 	std::vector<std::unique_ptr<Test>> _tests;
