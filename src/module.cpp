@@ -38,8 +38,8 @@ void CppLanguageModule::Shutdown() {
 
 void CppLanguageModule::OnMethodExport(PluginRef plugin) {
 	auto pluginName = plugin.GetName();
-	for (const auto& [name, addr] : plugin.GetMethods()) {
-		_nativesMap.try_emplace(std::format("{}.{}", pluginName, name), addr);
+	for (const auto& [method, addr] : plugin.GetMethods()) {
+		_nativesMap.try_emplace(std::format("{}.{}", pluginName, method.GetName()), addr);
 	}
 }
 
@@ -47,17 +47,11 @@ LoadResult CppLanguageModule::OnPluginLoad(PluginRef plugin) {
 	fs::path entryPoint(plugin.GetDescriptor().GetEntryPoint());
 	fs::path assemblyPath(plugin.GetBaseDir() / entryPoint.parent_path() / std::format(CPPLM_LIBRARY_PREFIX "{}" CPPLM_LIBRARY_SUFFIX, entryPoint.filename().string()));
 
-#if CPPLM_PLATFORM_LINUX || CPPLM_PLATFORM_APPLE
-	const bool sections = true;
-#else
-	const bool sections = false;
-#endif
-
 	LoadFlag flags = LoadFlag::Lazy;
 	if (_provider->IsPreferOwnSymbols())
 		flags |= LoadFlag::Deepbind;
 
-	auto assembly = std::make_unique<Assembly>(assemblyPath, flags, sections);
+	auto assembly = std::make_unique<Assembly>(assemblyPath, flags);
 	if (!assembly->IsValid()) {
 		return ErrorData{ std::format("Failed to load assembly: {}", assembly->GetError()) };
 	}
@@ -95,7 +89,7 @@ LoadResult CppLanguageModule::OnPluginLoad(PluginRef plugin) {
 
 	for (const auto& method : exportedMethods) {
 		if (auto const func = assembly->GetFunctionByName(method.GetFunctionName())) {
-			methods.emplace_back(method.GetName(), func);
+			methods.emplace_back(method, func);
 		} else {
 			funcErrors.emplace_back(method.GetName());
 		}
