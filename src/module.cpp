@@ -107,10 +107,17 @@ LoadResult CppLanguageModule::OnPluginLoad(PluginRef plugin) {
 		void* ptr;
 	} cast{plugin};
 
-	const int resultVersion = initFunc(_pluginApi, kApiVersion, cast.ptr);
-	if (resultVersion != 0) {
-		return ErrorData{ std::format("Not supported plugin api {}, max supported {}", resultVersion, kApiVersion) };
+	const auto [requiredVersion, pluginBuildType] = initFunc(_pluginApi, kApiVersion, cast.ptr);
+	if (requiredVersion != 0) {
+		return ErrorData{ std::format("Not supported plugin api {}, max supported {}", requiredVersion, kApiVersion) };
 	}
+
+#if CPPLM_PLATFORM_WINDOWS
+	constexpr bool cpplmBuildType = CPPLM_IS_DEBUG;
+	if (pluginBuildType != cpplmBuildType) {
+		return ErrorData{ std::format("Mismatch between module ({}) build type and plugin ({}) build type.", (cpplmBuildType ? "debug" : "release"), (pluginBuildType ? "debug" : "release")) };
+	}
+#endif
 
 	const auto [_, result] = _assemblyMap.try_emplace(plugin.GetId(), std::move(assembly), startFunc, endFunc);
 	if (!result) {

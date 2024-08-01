@@ -4,44 +4,47 @@
 #include <cstdint>
 #include <optional>
 #include <filesystem>
+#include <utility>
 #include <vector>
 #include <span>
 
 namespace plugify {
-	constexpr int kApiVersion = 1;
+	constexpr int32_t kApiVersion = 1;
 
-	namespace plugin {
-		using IPlugin = void*;
-	}
+	extern "C"
+	struct PluginResult {
+		int32_t version;
+		bool debug;
+	};
 
-	using InitFunc = int (*)(std::span<void*>, int, plugin::IPlugin);
+	using InitFunc = PluginResult (*)(std::span<void*>, int32_t, void*);
 	using StartFunc = void (*)();
 	using EndFunc = void (*)();
 
 	using GetMethodPtrFn = void* (*)(std::string_view);
+	using GetMethodPtr2Fn = void (*)(std::string_view, void**);
 	using GetBaseDirFn = const std::filesystem::path& (*)();
 	using IsModuleLoadedFn = bool (*)(std::string_view, std::optional<int32_t>, bool);
 	using IsPluginLoadedFn = bool (*)(std::string_view, std::optional<int32_t>, bool);
 
 	extern GetMethodPtrFn GetMethodPtr;
+	extern GetMethodPtr2Fn GetMethodPtr2;
 	extern GetBaseDirFn GetBaseDir;
 	extern IsModuleLoadedFn IsModuleLoaded;
 	extern IsPluginLoadedFn IsPluginLoaded;
 
 	namespace plugin {
-		extern IPlugin handle;
-
-		using GetIdFn = std::ptrdiff_t (*)(IPlugin);
-		using GetNameFn = std::string_view (*)(IPlugin);
-		using GetFullNameFn = std::string_view (*)(IPlugin);
-		using GetDescriptionFn = std::string_view (*)(IPlugin);
-		using GetVersionFn = std::string_view (*)(IPlugin);
-		using GetAuthorFn = std::string_view (*)(IPlugin);
-		using GetWebsiteFn = std::string_view (*)(IPlugin);
-		using GetBaseDirFn = const std::filesystem::path& (*)(IPlugin);
-		using GetDependenciesFn = std::vector<std::string_view> (*)(IPlugin);
-		using FindResourceFn = std::optional<std::filesystem::path> (*)(IPlugin, const std::filesystem::path&);
-
+		using GetIdFn = std::ptrdiff_t (*)(void*);
+		using GetNameFn = std::string_view (*)(void*);
+		using GetFullNameFn = std::string_view (*)(void*);
+		using GetDescriptionFn = std::string_view (*)(void*);
+		using GetVersionFn = std::string_view (*)(void*);
+		using GetAuthorFn = std::string_view (*)(void*);
+		using GetWebsiteFn = std::string_view (*)(void*);
+		using GetBaseDirFn = const std::filesystem::path& (*)(void*);
+		using GetDependenciesFn = std::vector<std::string_view> (*)(void*);
+		using FindResourceFn = std::optional<std::filesystem::path> (*)(void*, const std::filesystem::path&);
+		extern void* handle;
 		extern GetIdFn GetId;
 		extern GetNameFn GetName;
 		extern GetFullNameFn GetFullName;
@@ -80,11 +83,12 @@ namespace plugify {
 
 #define EXPOSE_PLUGIN(plugin_api, interface_addr) namespace plugify { \
 	GetMethodPtrFn GetMethodPtr{ nullptr }; \
+	GetMethodPtr2Fn GetMethodPtr2{ nullptr }; \
 	GetBaseDirFn GetBaseDir{ nullptr }; \
 	IsModuleLoadedFn IsModuleLoaded{ nullptr }; \
 	IsPluginLoadedFn IsPluginLoaded{ nullptr }; \
 	namespace plugin { \
-		IPlugin handle{ nullptr }; \
+		void* handle{ nullptr }; \
 		GetIdFn GetId{ nullptr }; \
 		GetNameFn GetName{ nullptr }; \
 		GetFullNameFn GetFullName{ nullptr }; \
@@ -97,12 +101,13 @@ namespace plugify {
 		FindResourceFn FindResource{ nullptr }; \
 	} \
 	extern "C" \
-	plugin_api int Plugify_Init(std::span<void*> api, int version, plugin::IPlugin handle) { \
+	plugin_api PluginResult Plugify_Init(std::span<void*> api, int32_t version, void* handle) { \
 		if (version < kApiVersion) { \
-			return kApiVersion; \
+			return { kApiVersion, PLUGIFY_IS_DEBUG }; \
 		} \
 		size_t i = 0; \
 		GetMethodPtr = reinterpret_cast<GetMethodPtrFn>(api[i++]); \
+		GetMethodPtr2 = reinterpret_cast<GetMethodPtr2Fn>(api[i++]); \
 		GetBaseDir = reinterpret_cast<GetBaseDirFn>(api[i++]); \
 		IsModuleLoaded = reinterpret_cast<IsModuleLoadedFn>(api[i++]); \
 		IsPluginLoaded = reinterpret_cast<IsPluginLoadedFn>(api[i++]); \
@@ -117,7 +122,7 @@ namespace plugify {
 		plugin::GetDependencies = reinterpret_cast<plugin::GetDependenciesFn>(api[i++]); \
 		plugin::FindResource = reinterpret_cast<plugin::FindResourceFn>(api[i++]); \
 		plugin::handle = handle; \
-		return 0; \
+		return { 0, PLUGIFY_IS_DEBUG }; \
 	} \
 	extern "C" \
 	plugin_api void Plugify_PluginStart() { \
