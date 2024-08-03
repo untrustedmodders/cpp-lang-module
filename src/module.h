@@ -49,7 +49,7 @@ namespace cpplm {
 		plugify::LoadResult OnPluginLoad(plugify::PluginRef plugin) override;
 		void OnPluginStart(plugify::PluginRef plugin) override;
 		void OnPluginEnd(plugify::PluginRef plugin) override;
-		bool IsDebugBuild() override { return CPPLM_IS_DEBUG; };
+		bool IsDebugBuild() override;
 
 		const std::shared_ptr<plugify::IPlugifyProvider>& GetProvider() { return _provider; }
 		plugify::MemAddr GetNativeMethod(std::string_view methodName) const;

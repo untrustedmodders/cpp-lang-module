@@ -7,9 +7,9 @@
     "description": "Adds support for C++ plugins",
     "createdBy": "untrustedmodders",
     "createdByURL": "https://github.com/untrustedmodders/",
-    "docsURL": "https://github.com/untrustedmodders/cpp-lang-module/README.md",
+    "docsURL": "https://github.com/untrustedmodders/cpp-lang-module/blob/main/README.md",
     "downloadURL": "https://github.com/untrustedmodders/cpp-lang-module/releases/download/v${CPPLM_VERSION}/${CPPLM_PACKAGE}.zip",
-    "updateURL": "https://untrustedmodders.github.com/cpp-lang-module/cpp-lang-module.json",
+    "updateURL": "https://untrustedmodders.github.io/cpp-lang-module/cpp-lang-module.json",
     "supportedPlatforms": [],
     "forceLoad": false
 }

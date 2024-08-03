@@ -36,6 +36,10 @@ void CppLanguageModule::Shutdown() {
 	_provider.reset();
 }
 
+bool CppLanguageModule::IsDebugBuild() {
+	return CPPLM_IS_DEBUG;
+}
+
 void CppLanguageModule::OnMethodExport(PluginRef plugin) {
 	for (const auto& [method, addr] : plugin.GetMethods()) {
 		_nativesMap.try_emplace(std::format("{}.{}", plugin.GetName(), method.GetName()), addr);
