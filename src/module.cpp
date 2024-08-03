@@ -37,9 +37,8 @@ void CppLanguageModule::Shutdown() {
 }
 
 void CppLanguageModule::OnMethodExport(PluginRef plugin) {
-	auto pluginName = plugin.GetName();
 	for (const auto& [method, addr] : plugin.GetMethods()) {
-		_nativesMap.try_emplace(std::format("{}.{}", pluginName, method.GetName()), addr);
+		_nativesMap.try_emplace(std::format("{}.{}", plugin.GetName(), method.GetName()), addr);
 	}
 }
 
@@ -187,27 +186,27 @@ UniqueId GetPluginId(PluginRef plugin) {
 	return plugin.GetId();
 }
 
-std::string_view GetPluginName(PluginRef plugin) {
+const std::string& GetPluginName(PluginRef plugin) {
 	return plugin.GetName();
 }
 
-std::string_view GetPluginFullName(PluginRef plugin) {
+const std::string& GetPluginFullName(PluginRef plugin) {
 	return plugin.GetFriendlyName();
 }
 
-std::string_view GetPluginDescription(PluginRef plugin) {
+const std::string& GetPluginDescription(PluginRef plugin) {
 	return plugin.GetDescriptor().GetDescription();
 }
 
-std::string_view GetPluginVersion(PluginRef plugin) {
+const std::string& GetPluginVersion(PluginRef plugin) {
 	return plugin.GetDescriptor().GetVersionName();
 }
 
-std::string_view GetPluginAuthor(PluginRef plugin) {
+const std::string& GetPluginAuthor(PluginRef plugin) {
 	return plugin.GetDescriptor().GetCreatedBy();
 }
 
-std::string_view GetPluginWebsite(PluginRef plugin) {
+const std::string& GetPluginWebsite(PluginRef plugin) {
 	return plugin.GetDescriptor().GetCreatedByURL();
 }
 
@@ -215,9 +214,9 @@ const fs::path& GetPluginBaseDir(PluginRef plugin) {
 	return plugin.GetBaseDir();
 }
 
-std::vector<std::string_view> GetPluginDependencies(PluginRef plugin) {
+std::vector<std::string> GetPluginDependencies(PluginRef plugin) {
 	std::span<const PluginReferenceDescriptorRef> dependencies = plugin.GetDescriptor().GetDependencies();
-	std::vector<std::string_view> deps;
+	std::vector<std::string> deps;
 	deps.reserve(dependencies.size());
 	for (const auto& dependency : dependencies) {
 		deps.emplace_back(dependency.GetName());
